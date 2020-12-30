@@ -35,11 +35,10 @@ class TokenRequester:
         if accounts:
             chosen = accounts[0]
             result = self._app.acquire_token_silent(self._scope, account=chosen)
-
-        if not result:
-            return self._acquire_token_interactively()
-        if "access_token" in result:
-            return result["access_token"]
+            if not result:
+                return self._acquire_token_interactively()
+            if "access_token" in result:
+                return result["access_token"]
 
     def _acquire_token_interactively(self):
         flow = self._app.initiate_device_flow(scopes=self._scope)

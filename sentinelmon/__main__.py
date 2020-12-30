@@ -5,9 +5,12 @@ import json
 import sys, os
 from .auth import TokenRequester
 
-parser = argparse.ArgumentParser(prog="sentinelmon", description="Simple Azure Sentinel monitor")
+parser = argparse.ArgumentParser(
+    prog="sentinelmon", description="Simple Azure Sentinel monitor"
+)
 
 args = parser.parse_args()
+
 
 def main():
     global args
@@ -16,6 +19,7 @@ def main():
     if not token:
         print("Could not acquire token")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
