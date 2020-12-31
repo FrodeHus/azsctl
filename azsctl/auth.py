@@ -1,4 +1,4 @@
-from sentinelmon import current_config
+from azsctl import current_config
 import msal
 import sys, os, atexit
 

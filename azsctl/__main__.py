@@ -1,13 +1,13 @@
 import argparse
 import json
 from textwrap import indent
-from sentinelmon.api import AzureManagementApi, AzureSentinelApi
-from sentinelmon.auth import TokenRequester
+from azsctl.api import AzureManagementApi, AzureSentinelApi
+from azsctl.auth import TokenRequester
 from PyInquirer import prompt
-from sentinelmon import current_config
+from azsctl import current_config
 
 parser = argparse.ArgumentParser(
-    prog="sentinelmon", description="Simple Azure Sentinel monitor"
+    prog="azsctl", description="Simple Azure Sentinel monitor"
 )
 
 subparsers = parser.add_subparsers(dest="group")

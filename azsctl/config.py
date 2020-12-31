@@ -14,7 +14,7 @@ class Config:
         from pathlib import Path
 
         home = str(Path.home())
-        self.config_path = f"{home}/.sentinelmon"
+        self.config_path = f"{home}/.azsctl"
         self.config_file_path = f"{self.config_path}/config.json"
         if not os.path.exists(self.config_path):
             os.makedirs(self.config_path)

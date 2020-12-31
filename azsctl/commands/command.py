@@ -1,4 +1,4 @@
-from sentinelmon import current_config
+from azsctl import current_config
 
 class SubCommand:
     def __init__(self):

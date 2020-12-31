@@ -1,1 +1,1 @@
-# sentinelmon
+# azsctl

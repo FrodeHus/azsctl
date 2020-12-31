@@ -1,6 +1,6 @@
 import unittest
 from unittest import mock
-from sentinelmon.api import AzureSentinelApi
+from azsctl.api import AzureSentinelApi
 
 class AzureSentinelApiTests(unittest.TestCase):
     def test_endpoint_generation(self):
