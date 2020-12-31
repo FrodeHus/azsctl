@@ -1,3 +1,4 @@
+from sentinelmon.config import Config
 import msal
 import requests
 import sys, os, atexit
@@ -5,6 +6,7 @@ import sys, os, atexit
 
 class TokenRequester:
     def __init__(self):
+        self._config = Config()
         self._scope = ["https://management.core.windows.net//user_impersonation"]
         cache = self._init_cache()
         self._app = msal.PublicClientApplication(
@@ -14,11 +16,8 @@ class TokenRequester:
         )
 
     def _init_cache(self):
-        from pathlib import Path
-
-        home = str(Path.home())
         cache = msal.SerializableTokenCache()
-        cachefile = f"{home}/.sentinelmon/tokencache"
+        cachefile = f"{self._config.config_path}/tokencache"
         if os.path.exists(cachefile):
             cache.deserialize(open(cachefile, "r").read())
 
@@ -32,13 +31,14 @@ class TokenRequester:
 
     def acquire_token(self):
         accounts = self._app.get_accounts()
+        result = None
         if accounts:
             chosen = accounts[0]
             result = self._app.acquire_token_silent(self._scope, account=chosen)
-            if not result:
-                return self._acquire_token_interactively()
-            if "access_token" in result:
-                return result["access_token"]
+        if not result:
+            return self._acquire_token_interactively()
+        if "access_token" in result:
+            return result["access_token"]
 
     def _acquire_token_interactively(self):
         flow = self._app.initiate_device_flow(scopes=self._scope)
