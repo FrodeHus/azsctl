@@ -1,7 +1,5 @@
-from re import sub
-from sentinelmon.config import Config
+from sentinelmon import current_config
 import requests
-import json
 import sys
 from .auth import TokenRequester
 
@@ -9,7 +7,6 @@ base_url = "https://management.azure.com"
 class BaseApi:
     def __init__(self, token_requester : TokenRequester):
         self._token_requester = token_requester
-        self._config = Config()
     
     def get_access_token(self):
         token = self._token_requester.acquire_token()
@@ -28,6 +25,15 @@ class BaseApi:
 class AzureSentinelApi(BaseApi):
     def __init__(self, token_requester : TokenRequester):
         super().__init__(token_requester)        
+    
+    def get_incidents(self):
+        """
+        Gets all Azure Sentinel incidents
+        """
+        _, workspace_id = current_config.get_workspace()
+        endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
+        incidents = self.get(endpoint)
+        return incidents
 
 class AzureManagementApi(BaseApi):
     def __init__(self, token_requester : TokenRequester):
@@ -45,12 +51,14 @@ class AzureManagementApi(BaseApi):
         """
         Lists all Log Analytics workspaces in the active subscription
         """
-        workspaces = self.get(f"subscriptions/{self._config.get(Config.SUBSCRIPTION_ID)}/providers/Microsoft.OperationalInsights/workspaces?api-version=2020-08-01")
+        _, subscription_id = current_config.get_subscription()
+        workspaces = self.get(f"subscriptions/{subscription_id}/providers/Microsoft.OperationalInsights/workspaces?api-version=2020-08-01")
         return workspaces
 
     def get_current_workspace(self):
         """
         Gets the currently selected workspace metadata
         """
-        workspace = self.get(f"{self._config.get(Config.WORKSPACE_ID)}?api-version=2020-08-01")
+        _, workspace_id = current_config.get_workspace()
+        workspace = self.get(f"{workspace_id}?api-version=2020-08-01")
         return workspace

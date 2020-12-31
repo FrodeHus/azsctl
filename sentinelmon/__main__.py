@@ -1,16 +1,25 @@
 import argparse
 import json
 from textwrap import indent
-from sentinelmon.config import Config
 from sentinelmon.api import AzureManagementApi, AzureSentinelApi
 from sentinelmon.auth import TokenRequester
 from PyInquirer import prompt
+from sentinelmon import current_config
 
 parser = argparse.ArgumentParser(
     prog="sentinelmon", description="Simple Azure Sentinel monitor"
 )
 
+subparsers = parser.add_subparsers(dest="group")
+incident_parser = subparsers.add_parser("incident", help="Incident subcommands")
+incident_parser.add_argument(
+    "--list-incidents", action="store_true", help="Lists all active incidents"
+)
+
+rule_parser = subparsers.add_parser("rule", help="Rule subcommands")
+
 group = parser.add_argument_group()
+
 group.add_argument(
     "--login", action="store_true", help="Log in to your Azure subscription"
 )
@@ -28,11 +37,9 @@ args = parser.parse_args()
 token_requester = TokenRequester()
 management_api = AzureManagementApi(token_requester)
 
-config = Config()
-
 
 def login():
-    global config, management_api
+    global management_api
     subs = management_api.get_subscriptions()
     select_subscription = {
         "type": "list",
@@ -48,8 +55,9 @@ def login():
             )
         )
     )[0]
-    config.set(Config.SUBSCRIPTION, subscription["displayName"])
-    config.set(Config.SUBSCRIPTION_ID, subscription["subscriptionId"])
+    current_config.set_subscription(
+        subscription["displayName"], subscription["subscriptionId"]
+    )
     select_workspace()
 
 
@@ -66,14 +74,20 @@ def select_workspace():
     workspace = list(
         filter(lambda x: x["name"] == selection["workspace"], workspaces["value"])
     )[0]
-    config.set(Config.WORKSPACE, workspace["name"])
-    config.set(Config.WORKSPACE_ID, workspace["id"])
+    current_config.set_workspace(workspace["name"], workspace["id"])
 
 
 def show_workspace():
     global config, management_api
     workspace = management_api.get_current_workspace()
     print(json.dumps(workspace, indent=2))
+
+
+def list_incidents():
+    global token_requester
+    api = AzureSentinelApi(token_requester)
+    incidents = api.get_incidents()
+    print(json.dumps(incidents, indent=2))
 
 
 def main():
@@ -84,6 +98,10 @@ def main():
         select_workspace()
     if args.show_workspace:
         show_workspace()
+    if args.group == "incident":
+        if args.list_incidents:
+            list_incidents()
+
 
 if __name__ == "__main__":
     main()

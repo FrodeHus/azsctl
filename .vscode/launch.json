@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "sentinelmon",
-            "args": ["--show-workspace"]
+            "args": ["incident", "--list-incidents"]
         }
     ]
 }

@@ -1,12 +1,10 @@
-from sentinelmon.config import Config
+from sentinelmon import current_config
 import msal
-import requests
 import sys, os, atexit
 
 
 class TokenRequester:
     def __init__(self):
-        self._config = Config()
         self._scope = ["https://management.core.windows.net//user_impersonation"]
         cache = self._init_cache()
         self._app = msal.PublicClientApplication(
@@ -17,7 +15,7 @@ class TokenRequester:
 
     def _init_cache(self):
         cache = msal.SerializableTokenCache()
-        cachefile = f"{self._config.config_path}/tokencache"
+        cachefile = f"{current_config.config_path}/tokencache"
         if os.path.exists(cachefile):
             cache.deserialize(open(cachefile, "r").read())
 
