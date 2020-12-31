@@ -1,45 +1,20 @@
-import argparse
 import json
+import os,sys
 from textwrap import indent
 from azsctl.api import AzureManagementApi, AzureSentinelApi
 from azsctl.auth import TokenRequester
 from PyInquirer import prompt
 from azsctl import current_config
-
-parser = argparse.ArgumentParser(
-    prog="azsctl", description="Simple Azure Sentinel monitor"
-)
-
-subparsers = parser.add_subparsers(dest="group")
-incident_parser = subparsers.add_parser("incident", help="Incident subcommands")
-incident_parser.add_argument(
-    "--list-incidents", action="store_true", help="Lists all active incidents"
-)
-
-rule_parser = subparsers.add_parser("rule", help="Rule subcommands")
-
-group = parser.add_argument_group()
-
-group.add_argument(
-    "--login", action="store_true", help="Log in to your Azure subscription"
-)
-group.add_argument(
-    "--select-workspace",
-    action="store_true",
-    help="Retrieves all workspaces and lets you select which to set as active",
-)
-group.add_argument(
-    "--show-workspace",
-    action="store_true",
-    help="Displays metadata about the currently selected workspace",
-)
-args = parser.parse_args()
-token_requester = TokenRequester()
-management_api = AzureManagementApi(token_requester)
+from knack import CLI
+from knack.commands import CLICommandsLoader, CommandGroup
+from knack.arguments import ArgumentsContext, CLIArgumentType
+from knack.help import CLIHelp
+from knack.help_files import helps
 
 
 def login():
-    global management_api
+    token_requester = TokenRequester()
+    management_api = AzureManagementApi(token_requester)
     subs = management_api.get_subscriptions()
     select_subscription = {
         "type": "list",
@@ -58,11 +33,10 @@ def login():
     current_config.set_subscription(
         subscription["displayName"], subscription["subscriptionId"]
     )
-    select_workspace()
-
 
 def select_workspace():
-    global config, management_api
+    token_requester = TokenRequester()
+    management_api = AzureManagementApi(token_requester)
     workspaces = management_api.get_workspaces()
     select_workspace = {
         "type": "list",
@@ -76,32 +50,37 @@ def select_workspace():
     )[0]
     current_config.set_workspace(workspace["name"], workspace["id"])
 
-
-def show_workspace():
-    global config, management_api
-    workspace = management_api.get_current_workspace()
-    print(json.dumps(workspace, indent=2))
-
-
-def list_incidents():
-    global token_requester
-    api = AzureSentinelApi(token_requester)
-    incidents = api.get_incidents()
-    print(json.dumps(incidents, indent=2))
+helps[
+    "config"
+] = """
+    type: group
+    short-summary: Manage the CLI configuration.
+"""
 
 
-def main():
-    global args
-    if args.login:
-        login()
-    if args.select_workspace:
-        select_workspace()
-    if args.show_workspace:
-        show_workspace()
-    if args.group == "incident":
-        if args.list_incidents:
-            list_incidents()
+class CommandLoader(CLICommandsLoader):
+    def load_command_table(self, args):
+        with CommandGroup(self, "", "azsctl.__main__#{}") as g:
+            g.command("login", "login")
+            g.command("select-workspace", "select_workspace")
+        with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
+            g.command("list", "list_incidents")
+        return super(CommandLoader, self).load_command_table(args)
 
 
-if __name__ == "__main__":
-    main()
+class Help(CLIHelp):
+    def __init__(self, cli_ctx=None):
+        super(Help, self).__init__(
+            cli_ctx=cli_ctx,
+        )
+
+name="azsctl"
+cli = CLI(
+    cli_name=name,
+    config_dir=os.path.expanduser(os.path.join("~", ".{}".format(name))),
+    config_env_var_prefix=name,
+    commands_loader_cls=CommandLoader,
+    help_cls=Help,
+)
+exit_code = cli.invoke(sys.argv[1:])
+sys.exit(exit_code)
