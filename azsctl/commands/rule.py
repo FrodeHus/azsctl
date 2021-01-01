@@ -1,5 +1,3 @@
-from requests.api import delete
-from azsctl import current_config
 from azsctl.api import AzureSentinelApi
 from azsctl.validators import ScheduledRuleValidator
 import yaml
@@ -22,25 +20,25 @@ def run_rule_query(rule_id: str):
     data = execute_query(query)
     return data
 
-def update_rule(rule_id : str, edited_rule : dict):
-    api = AzureSentinelApi()
-
-
 def edit_rule(rule_id: str):
     from subprocess import call
     import tempfile, os, json
+
     api = AzureSentinelApi()
     EDITOR = os.getenv("EDITOR", "vim")
     rule = get_rule(rule_id)
+    del rule["properties"]["lastModifiedUtc"]
+    
     with tempfile.NamedTemporaryFile(suffix=".rule", delete=False, mode="w") as temp:
         rule_to_edit = json.dumps(rule, indent=2)
         temp.write(rule_to_edit)
         temp.flush()
         call([EDITOR, temp.name], shell=False)
+    
     with open(temp.name, "r") as edited_rule:
         rule = json.load(edited_rule)
-        del rule["properties"]["lastModifiedUtc"]
         result = api.update_alert_rule(rule_id, rule)
+    
     os.remove(temp.name)
     return result
 
