@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "azsctl",
-            "args": ["analytics", "query", "--kql", "AzureDiagnostics| summarize count() by Category"]
+            "args": ["rule", "run", "--rule-id", "88053384-c842-44fc-9e8a-2bf8a2ed643d"]
         }
     ]
 }
