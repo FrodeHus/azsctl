@@ -63,7 +63,14 @@ class ValidatorTests(unittest.TestCase):
         rule = yaml.full_load(test_rule)
         validator = ScheduledRuleValidator(rule)
         result = validator._validate_id()
-        self.assertTrue(result)        
+        self.assertTrue(result)  
+
+    def test_name_validation(self):
+        rule = yaml.full_load(test_rule)
+        validator = ScheduledRuleValidator(rule)
+        result = validator._validate_name()
+        self.assertTrue(result)
+
 
 if __name__ == "__main__":
     unittest.main()
