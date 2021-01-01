@@ -6,16 +6,25 @@ from azsctl.commands.analytics import execute_query
 
 
 def list_rules():
+    """
+    Lists all alert rules in the active workspace
+    """
     api = AzureSentinelApi()
     return api.get_alert_rules()
 
 
 def get_rule(rule_id: str):
+    """
+    Retrieve and display alert rule
+    """
     api = AzureSentinelApi()
     return api.get_alert_rule(rule_id)
 
 
 def run_rule_query(rule_id: str):
+    """
+    Executes the query in the specified alert rule and returns the results
+    """
     rule = get_rule(rule_id)
     query = rule["properties"]["query"]
     data = execute_query(query)
@@ -23,6 +32,9 @@ def run_rule_query(rule_id: str):
 
 
 def edit_rule(rule_id: str = None):
+    """
+    Edit alert rule
+    """
     if not rule_id:
         rule_id = select_rule()
 
@@ -49,6 +61,9 @@ def edit_rule(rule_id: str = None):
 
 
 def import_rule(file: str, validate_only: bool = False):
+    """
+    Import alert rule from YAML
+    """
     with open(file, "r") as f:
         documents = yaml.full_load(f)
 

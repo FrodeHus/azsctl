@@ -45,7 +45,7 @@ class Config:
         self._set(Config.WORKSPACE, workspace_name)
         self._set(Config.WORKSPACE_ID, workspace_id)
 
-    def get_subscription(self) -> Tuple[str, any]:
+    def get_subscription(self) -> Tuple[str, str]:
         """
         Gets the active subscription name and id
         """
@@ -53,7 +53,7 @@ class Config:
         subscription_id = self._get(Config.SUBSCRIPTION_ID)
         return subscription_name, subscription_id
 
-    def get_workspace(self) -> Tuple[str, any]:
+    def get_workspace(self) -> Tuple[str, str]:
         """
         Gets the active workspace name and id
         """

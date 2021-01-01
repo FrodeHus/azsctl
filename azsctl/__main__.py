@@ -48,12 +48,31 @@ def select_workspace():
     current_config.set_workspace(workspace["name"], workspace["id"])
 
 helps[
-    "config"
+    "login"
 ] = """
-    type: group
-    short-summary: Manage the CLI configuration.
+type: command
+short-summary: Log in to your Azure subscription and select which workspace to user with Sentinel.
 """
 
+helps["incident"] = """
+type: group
+short-summary: Work with Azure Sentinel incidents
+"""
+
+helps["rule"] = """
+type: group
+short-summary: Add/edit/view/delete/import Azure Sentinel alert rules
+"""
+
+helps["analytics"] = """
+type: group
+short-summary: Query data in your log analytics workspace
+"""
+
+helps["workspace"] = """
+type: group
+short-summary: View information about the workspace(s) you have access to
+"""
 
 class CommandLoader(CLICommandsLoader):
     def load_command_table(self, args):
