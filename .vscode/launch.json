@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "azsctl",
-            "args": ["rule", "run", "--rule-id", "88053384-c842-44fc-9e8a-2bf8a2ed643d"]
+            "args": ["rule", "edit", "--rule-id", "afe788d2-e32b-4b4e-9fc4-68342562daff"]
         }
     ]
 }

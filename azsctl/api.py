@@ -26,13 +26,29 @@ class BaseApi:
             print(error)
             sys.exit(1)
 
-    def post(self, path: str, payload: any, url : str = base_url):
+    def post(self, path: str, payload: any, url: str = base_url):
         try:
             result = requests.post(
                 f"{url}/{path}",
                 data=json.dumps(payload),
                 headers={"Authorization": "Bearer " + self.get_access_token()},
             )
+            return result.json()
+        except Exception as error:
+            print(error)
+            sys.exit(1)
+
+    def put(self, path: str, payload: any, url: str = base_url):
+        try:
+            result = requests.put(
+                f"{url}/{path}",
+                json=payload,
+                headers={"Authorization": "Bearer " + self.get_access_token()},
+            )
+
+            if result.status_code != 200:
+                return result.status_code
+
             return result.json()
         except Exception as error:
             print(error)
@@ -69,6 +85,10 @@ class AzureSentinelApi(BaseApi):
         alert_rules = self.get(endpoint)
         return alert_rules["value"]
 
+    def update_alert_rule(self, rule_id : str, rule):
+        endpoint = f"{self._endpoint}/alertRules/{rule_id}?api-version=2020-01-01"
+        result = self.put(endpoint, rule)
+        return result
 
 class AzureManagementApi(BaseApi):
     def __init__(self):
@@ -107,6 +127,6 @@ class AzureLogAnalytics(BaseApi):
         self._endpoint = workspace_id
 
     def execute_query(self, query: str):
-        data = {'query': query}
+        data = {"query": query}
         result = self.post(f"{self._endpoint}/api/query?api-version=2020-08-01", data)
         return result

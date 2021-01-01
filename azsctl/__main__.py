@@ -65,6 +65,7 @@ class CommandLoader(CLICommandsLoader):
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
             g.command("list", "list_rules")
             g.command("show", "get_rule")
+            g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
             g.command("import", "import_rule", confirmation=True)
         with CommandGroup(self, "analytics", "azsctl.commands.analytics#{}") as g:
