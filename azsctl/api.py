@@ -1,42 +1,50 @@
 from azsctl import current_config
 import requests
 import sys
+import json
 from .auth import TokenRequester
 
 base_url = "https://management.azure.com"
+
+
 class BaseApi:
     def __init__(self):
         self._token_requester = TokenRequester()
-    
+
     def get_access_token(self):
         token = self._token_requester.acquire_token()
         return token
-    
-    def get(self, path : str):
+
+    def get(self, path: str):
         try:
-            result = requests.get(f"{base_url}/{path}", headers={
-                'Authorization': 'Bearer ' + self.get_access_token()
-            }).json()
+            result = requests.get(
+                f"{base_url}/{path}",
+                headers={"Authorization": "Bearer " + self.get_access_token()},
+            ).json()
             return result
         except Exception as error:
             print(error)
             sys.exit(1)
 
-    def post(self, path : str, payload : any):
+    def post(self, path: str, payload: any, url : str = base_url):
         try:
-            result = requests.post(f"{base_url}/{path}", data=payload,
-            headers={
-                'Authorization': 'Bearer ' + self.get_access_token()
-            })
+            result = requests.post(
+                f"{url}/{path}",
+                data=json.dumps(payload),
+                headers={"Authorization": "Bearer " + self.get_access_token()},
+            )
+            return result.json()
         except Exception as error:
             print(error)
             sys.exit(1)
+
+
 class AzureSentinelApi(BaseApi):
     def __init__(self):
         super().__init__()
         _, workspace_id = current_config.get_workspace()
-        self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"   
-    
+        self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"
+
     def get_incidents(self):
         """
         Gets all Azure Sentinel incidents
@@ -44,8 +52,8 @@ class AzureSentinelApi(BaseApi):
         endpoint = f"{self._endpoint}incidents?api-version=2020-01-01"
         incidents = self.get(endpoint)
         return incidents["value"]
-    
-    def get_alert_rule(self, rule_id : str):
+
+    def get_alert_rule(self, rule_id: str):
         """
         Get alert rule by id
         """
@@ -60,6 +68,7 @@ class AzureSentinelApi(BaseApi):
         endpoint = f"{self._endpoint}alertRules?api-version=2020-01-01"
         alert_rules = self.get(endpoint)
         return alert_rules["value"]
+
 
 class AzureManagementApi(BaseApi):
     def __init__(self):
@@ -77,7 +86,9 @@ class AzureManagementApi(BaseApi):
         Lists all Log Analytics workspaces in the active subscription
         """
         _, subscription_id = current_config.get_subscription()
-        workspaces = self.get(f"subscriptions/{subscription_id}/providers/Microsoft.OperationalInsights/workspaces?api-version=2020-08-01")
+        workspaces = self.get(
+            f"subscriptions/{subscription_id}/providers/Microsoft.OperationalInsights/workspaces?api-version=2020-08-01"
+        )
         return workspaces["value"]
 
     def get_current_workspace(self):
@@ -86,11 +97,16 @@ class AzureManagementApi(BaseApi):
         """
         _, workspace_id = current_config.get_workspace()
         workspace = self.get(f"{workspace_id}?api-version=2020-08-01")
-        return workspace["value"]
+        return workspace
+
 
 class AzureLogAnalytics(BaseApi):
     def __init__(self):
         super().__init__()
+        _, workspace_id = current_config.get_workspace()
+        self._endpoint = workspace_id
 
-    def execute_query(self, query : str):
-        pass
+    def execute_query(self, query: str):
+        data = {'query': query}
+        result = self.post(f"{self._endpoint}/api/query?api-version=2020-08-01", data)
+        return result
