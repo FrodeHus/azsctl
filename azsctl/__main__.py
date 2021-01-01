@@ -20,13 +20,13 @@ def login():
         "type": "list",
         "name": "subscription",
         "message": "Which subscription would you like to use?",
-        "choices": [sub["displayName"] for sub in subs["value"]],
+        "choices": [sub["displayName"] for sub in subs],
     }
     selection = prompt(select_subscription)
     subscription = (
         list(
             filter(
-                lambda x: x["displayName"] == selection["subscription"], subs["value"]
+                lambda x: x["displayName"] == selection["subscription"], subs
             )
         )
     )[0]
@@ -42,11 +42,11 @@ def select_workspace():
         "type": "list",
         "name": "workspace",
         "message": "Which workspace would you like to use?",
-        "choices": [w["name"] for w in workspaces["value"]],
+        "choices": [w["name"] for w in workspaces],
     }
     selection = prompt(select_workspace)
     workspace = list(
-        filter(lambda x: x["name"] == selection["workspace"], workspaces["value"])
+        filter(lambda x: x["name"] == selection["workspace"], workspaces)
     )[0]
     current_config.set_workspace(workspace["name"], workspace["id"])
 

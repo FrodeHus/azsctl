@@ -22,6 +22,15 @@ class BaseApi:
             print(error)
             sys.exit(1)
 
+    def post(self, path : str, payload : any):
+        try:
+            result = requests.post(f"{base_url}/{path}", data=payload,
+            headers={
+                'Authorization': 'Bearer ' + self.get_access_token()
+            })
+        except Exception as error:
+            print(error)
+            sys.exit(1)
 class AzureSentinelApi(BaseApi):
     def __init__(self, token_requester : TokenRequester):
         super().__init__(token_requester)        
@@ -33,19 +42,18 @@ class AzureSentinelApi(BaseApi):
         _, workspace_id = current_config.get_workspace()
         endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
         incidents = self.get(endpoint)
-        return incidents
+        return incidents["value"]
 
 class AzureManagementApi(BaseApi):
     def __init__(self, token_requester : TokenRequester):
         super().__init__(token_requester)
-        self._token_requester = token_requester
 
     def get_subscriptions(self):
         """
         Lists all subscriptions the user has access to
         """
         subscriptions = self.get("subscriptions?api-version=2014-04-01-preview")
-        return subscriptions
+        return subscriptions["value"]
 
     def get_workspaces(self):
         """
@@ -53,7 +61,7 @@ class AzureManagementApi(BaseApi):
         """
         _, subscription_id = current_config.get_subscription()
         workspaces = self.get(f"subscriptions/{subscription_id}/providers/Microsoft.OperationalInsights/workspaces?api-version=2020-08-01")
-        return workspaces
+        return workspaces["value"]
 
     def get_current_workspace(self):
         """
@@ -61,4 +69,11 @@ class AzureManagementApi(BaseApi):
         """
         _, workspace_id = current_config.get_workspace()
         workspace = self.get(f"{workspace_id}?api-version=2020-08-01")
-        return workspace
+        return workspace["value"]
+
+class AzureLogAnalytics(BaseApi):
+    def __init__(self, token_requester : TokenRequester):
+        super().__init__(token_requester)
+    
+    def execute_query(self, query : str):
+        pass
