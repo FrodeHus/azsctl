@@ -66,6 +66,11 @@ class CommandLoader(CLICommandsLoader):
             g.command("list", "list_rules")
             g.command("import", "import_rule")
         return super(CommandLoader, self).load_command_table(args)
+    
+    def load_arguments(self, command):
+        with ArgumentsContext(self, 'rule import') as ac:
+            ac.argument('validate-only', type=bool)
+        super(CommandLoader, self).load_arguments(command)
 
 
 class Help(CLIHelp):

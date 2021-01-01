@@ -9,6 +9,8 @@ def list_rules():
 def import_rule(file : str, validate_only : bool = False):
     with open(file,"r") as f:
         documents = yaml.full_load(f)
-    
+    if validate_only:
+        return True
+
     for item, doc in documents.items():
         print(item, ":", doc)
