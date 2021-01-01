@@ -2,7 +2,6 @@ import json
 import os,sys
 from textwrap import indent
 from azsctl.api import AzureManagementApi, AzureSentinelApi
-from azsctl.auth import TokenRequester
 from PyInquirer import prompt
 from azsctl import current_config
 from knack import CLI
@@ -13,8 +12,7 @@ from knack.help_files import helps
 
 
 def login():
-    token_requester = TokenRequester()
-    management_api = AzureManagementApi(token_requester)
+    management_api = AzureManagementApi()
     subs = management_api.get_subscriptions()
     select_subscription = {
         "type": "list",
@@ -35,8 +33,7 @@ def login():
     )
 
 def select_workspace():
-    token_requester = TokenRequester()
-    management_api = AzureManagementApi(token_requester)
+    management_api = AzureManagementApi()
     workspaces = management_api.get_workspaces()
     select_workspace = {
         "type": "list",
@@ -65,6 +62,9 @@ class CommandLoader(CLICommandsLoader):
             g.command("select-workspace", "select_workspace")
         with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
             g.command("list", "list_incidents")
+        with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
+            g.command("list", "list_rules")
+            g.command("import", "import_rule")
         return super(CommandLoader, self).load_command_table(args)
 
 

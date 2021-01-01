@@ -5,8 +5,8 @@ from .auth import TokenRequester
 
 base_url = "https://management.azure.com"
 class BaseApi:
-    def __init__(self, token_requester : TokenRequester):
-        self._token_requester = token_requester
+    def __init__(self):
+        self._token_requester = TokenRequester()
     
     def get_access_token(self):
         token = self._token_requester.acquire_token()
@@ -32,21 +32,30 @@ class BaseApi:
             print(error)
             sys.exit(1)
 class AzureSentinelApi(BaseApi):
-    def __init__(self, token_requester : TokenRequester):
-        super().__init__(token_requester)        
+    def __init__(self):
+        super().__init__()
+        _, workspace_id = current_config.get_workspace()
+        self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"   
     
     def get_incidents(self):
         """
         Gets all Azure Sentinel incidents
         """
-        _, workspace_id = current_config.get_workspace()
-        endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
+        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01"
         incidents = self.get(endpoint)
         return incidents["value"]
+    
+    def get_alert_rules(self):
+        """
+        Gets all alert rules
+        """
+        endpoint = f"{self._endpoint}alertRules?api-version=2020-01-01"
+        alert_rules = self.get(endpoint)
+        return alert_rules["value"]
 
 class AzureManagementApi(BaseApi):
-    def __init__(self, token_requester : TokenRequester):
-        super().__init__(token_requester)
+    def __init__(self):
+        super().__init__()
 
     def get_subscriptions(self):
         """
@@ -72,8 +81,8 @@ class AzureManagementApi(BaseApi):
         return workspace["value"]
 
 class AzureLogAnalytics(BaseApi):
-    def __init__(self, token_requester : TokenRequester):
-        super().__init__(token_requester)
-    
+    def __init__(self):
+        super().__init__()
+
     def execute_query(self, query : str):
         pass
