@@ -6,6 +6,10 @@ def list_rules():
     api = AzureSentinelApi()
     return api.get_alert_rules()
 
+def get_rule(rule_id : str):
+    api = AzureSentinelApi()
+    return api.get_alert_rule(rule_id)
+
 def import_rule(file : str, validate_only : bool = False):
     with open(file,"r") as f:
         documents = yaml.full_load(f)

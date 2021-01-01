@@ -45,6 +45,14 @@ class AzureSentinelApi(BaseApi):
         incidents = self.get(endpoint)
         return incidents["value"]
     
+    def get_alert_rule(self, rule_id : str):
+        """
+        Get alert rule by id
+        """
+        endpoint = f"{self._endpoint}alertRules/{rule_id}?api-version=2020-01-01"
+        rule = self.get(endpoint)
+        return rule
+
     def get_alert_rules(self):
         """
         Gets all alert rules

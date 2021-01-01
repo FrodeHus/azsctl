@@ -64,7 +64,8 @@ class CommandLoader(CLICommandsLoader):
             g.command("list", "list_incidents")
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
             g.command("list", "list_rules")
-            g.command("import", "import_rule")
+            g.command("show", "get_rule")
+            g.command("import", "import_rule", confirmation=True)
         return super(CommandLoader, self).load_command_table(args)
     
     def load_arguments(self, command):
