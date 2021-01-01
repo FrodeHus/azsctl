@@ -1,5 +1,6 @@
 from azsctl import current_config
 from azsctl.api import AzureSentinelApi
+from azsctl.validators import ScheduledRuleValidator
 import yaml
 
 def list_rules():
@@ -13,8 +14,13 @@ def get_rule(rule_id : str):
 def import_rule(file : str, validate_only : bool = False):
     with open(file,"r") as f:
         documents = yaml.full_load(f)
-    if validate_only:
-        return True
 
+    validation_results = {}
     for item, doc in documents.items():
-        print(item, ":", doc)
+        validation_results[f"rule_{item}"] = validate_rule(doc)
+    if validate_only:
+        return validation_results
+
+def validate_rule(rule : dict):
+    validator = ScheduledRuleValidator(rule)
+    return validator.validate()
