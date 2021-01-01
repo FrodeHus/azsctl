@@ -8,9 +8,9 @@ setuptools.setup(
     author="Frode Hus",
     author_email="frode.hus@outlook.com",
     description="Simple tool that lets you control Azure Sentinel",
-    url="https://www.frodehus.com",
+    url="https://www.frodehus.dev",
     python_requires=">=3.6",
-    install_requires=["requests", "argparse", "msal", "alive_progress", "pyinquirer"],
+    install_requires=["requests", "knack", "msal", "alive_progress", "pyinquirer"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

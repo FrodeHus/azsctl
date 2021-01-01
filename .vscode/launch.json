@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "azsctl",
-            "args": ["login"]
+            "args": ["incident", "list"]
         }
     ]
 }
