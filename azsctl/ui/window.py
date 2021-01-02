@@ -1,6 +1,7 @@
 from azsctl.ui.statusbar import StatusBar
 from .ruleview import RuleList, RuleListWalker, RuleItem
 from .controller import Controller, RefreshableItems
+from azsctl.ui.tabs import TabPanel, TabItem
 from azsctl.ui import signals
 import urwid
 import asyncio
@@ -14,7 +15,8 @@ class TopMenu(urwid.WidgetWrap):
                 urwid.Button("Alert Rule"),
                 urwid.Button("Hunting"),
                 urwid.Button("Analytics"),
-            ], dividechars=2
+            ],
+            dividechars=2,
         )
         urwid.WidgetWrap.__init__(self, urwid.AttrMap(w, "heading"))
 
@@ -31,9 +33,23 @@ class Window(urwid.Frame):
                 for rule in self.controller.get_alert_rules()
             ]
 
+        tabs = [
+            TabItem("Incident", urwid.Pile([])),
+            TabItem(
+                "Alert rule",
+                urwid.AttrWrap(
+                    RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
+                    "background",
+                ),
+            ),
+            TabItem("Hunting", urwid.Pile([])),
+            TabItem("Threat indicators", urwid.Pile([])),
+            TabItem("Analytics", urwid.Pile([])),
+        ]
+
         super().__init__(
-            RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
-            header=TopMenu(),
+            # RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
+            TabPanel(tabs),
             footer=urwid.AttrWrap(self.statusbar, "background"),
         )
 

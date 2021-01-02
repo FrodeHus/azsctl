@@ -10,6 +10,7 @@ class AzsctlUI:
             ("background", "", "black"),
             ("body", "","black"),
             ("heading", "white", "dark blue"),
+            ("heading inactive", "light gray", "light blue"),
             ("focus", "light magenta", "light gray")
         ]
         self.controller = controller

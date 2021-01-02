@@ -36,3 +36,7 @@ Commands:
     select-workspace
 
 ```
+
+## Acknowledgements
+
+Took a lot of inspiration (and some code lines) from [mitmproxy](https://github.com/mitmproxy/mitmproxy) to bend [urwid](https://urwid.org) to my will.
