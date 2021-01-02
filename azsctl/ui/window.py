@@ -6,6 +6,19 @@ import urwid
 import asyncio
 
 
+class TopMenu(urwid.WidgetWrap):
+    def __init__(self):
+        w = urwid.Columns(
+            [
+                urwid.Button("Incident"),
+                urwid.Button("Alert Rule"),
+                urwid.Button("Hunting"),
+                urwid.Button("Analytics"),
+            ], dividechars=2
+        )
+        urwid.WidgetWrap.__init__(self, urwid.AttrMap(w, "heading"))
+
+
 class Window(urwid.Frame):
     def __init__(self, controller: Controller):
         self.statusbar = StatusBar()
@@ -20,7 +33,7 @@ class Window(urwid.Frame):
 
         super().__init__(
             RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
-            header=None,
+            header=TopMenu(),
             footer=urwid.AttrWrap(self.statusbar, "background"),
         )
 
