@@ -4,9 +4,12 @@ from azsctl.ui import signals
 from azsctl.ui.controller import Controller, RefreshableItems
 from azsctl.ui.statusbar import StatusBar
 from azsctl.ui.tabs import TabItem, TabPanel
-from azsctl.ui.widgets import SentinelItemList, SentinelItemListWalker
-from azsctl.ui.ruleview import RuleItem
-from azsctl.ui.incidentview import IncidentItem
+from azsctl.ui.widgets import (
+    SentinelItemList,
+    SentinelItemListWalker,
+    RuleItem,
+    IncidentItem,
+)
 
 
 class Window(urwid.Frame):
