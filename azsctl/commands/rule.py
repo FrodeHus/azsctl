@@ -26,9 +26,7 @@ def run_rule_query(rule_id: str = None):
     Executes the query in the specified alert rule and returns the results
     """
     if not rule_id:
-        # rule_id = select_rule()
-        view = ItemList(list_rules())
-        view.display()
+        rule_id = select_rule()
 
     rule = get_rule(rule_id)
     query = rule["properties"]["query"]
