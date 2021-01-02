@@ -64,7 +64,7 @@ class StatusBar(urwid.WidgetWrap):
     def redraw(self):
         workspace,_ = current_config.get_workspace()
         status = urwid.AttrWrap(urwid.Columns([
-            urwid.Text(""),
+            urwid.Text("Azure Sentinel Control"),
             urwid.Text(workspace, align="right"),
         ]), "heading")
         self.infobar._w = status
