@@ -3,7 +3,7 @@ from azsctl.api import AzureSentinelApi
 from azsctl.validators import ScheduledRuleValidator
 import yaml
 from azsctl.commands.analytics import execute_query
-
+from azsctl.ui import ItemList
 
 def list_rules():
     """
@@ -26,7 +26,9 @@ def run_rule_query(rule_id: str = None):
     Executes the query in the specified alert rule and returns the results
     """
     if not rule_id:
-        rule_id = select_rule()
+        # rule_id = select_rule()
+        view = ItemList(list_rules())
+        view.display()
 
     rule = get_rule(rule_id)
     query = rule["properties"]["query"]
