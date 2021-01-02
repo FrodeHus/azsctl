@@ -6,8 +6,9 @@ import urwid
 class AzsctlUI:
     def __init__(self) -> None:
         palette = [
-            ("background", "", "", "", "h230", "h33"),
-            ("body", "", "", "", "h254", "h235"),
+            ("background", "", "black"),
+            ("body", "","black"),
+            ("heading", "white", "dark blue")
         ]
         self.window = Window()
         self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input)

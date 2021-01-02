@@ -1,6 +1,6 @@
 import urwid
 from azsctl.ui import signals
-
+from azsctl import current_config
 
 class ActionBar(urwid.WidgetWrap):
     def __init__(self):
@@ -28,7 +28,22 @@ class ActionBar(urwid.WidgetWrap):
 
 
 class StatusBar(urwid.WidgetWrap):
+    REFRESH_TIME = 0.5 
+
     def __init__(self):
         self.infobar = urwid.WidgetWrap(urwid.Text(""))
         self.actionbar = ActionBar()
         super().__init__(urwid.Pile([self.infobar, self.actionbar]))
+        self.refresh()
+    
+    def refresh(self):
+        self.redraw()
+        signals.delayed_signal.send(seconds=self.REFRESH_TIME, callback=self.refresh)
+    
+    def redraw(self):
+        workspace,_ = current_config.get_workspace()
+        status = urwid.AttrWrap(urwid.Columns([
+            urwid.Text(""),
+            urwid.Text(workspace, align="right"),
+        ]), "heading")
+        self.infobar._w = status
