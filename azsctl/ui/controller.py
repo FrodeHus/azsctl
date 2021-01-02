@@ -11,6 +11,10 @@ class Controller:
         rules = self.sentinel_api.get_alert_rules()
         return rules
 
+    def get_incidents(self):
+        incidents = self.sentinel_api.get_incidents()
+        return incidents
+
 
 class RefreshableItems:
     def __init__(self, method, method_args):

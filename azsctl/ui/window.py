@@ -1,24 +1,12 @@
-from azsctl.ui.statusbar import StatusBar
-from .ruleview import RuleList, RuleListWalker, RuleItem
-from .controller import Controller, RefreshableItems
-from azsctl.ui.tabs import TabPanel, TabItem
-from azsctl.ui import signals
-import urwid
 import asyncio
-
-
-class TopMenu(urwid.WidgetWrap):
-    def __init__(self):
-        w = urwid.Columns(
-            [
-                urwid.Button("Incident"),
-                urwid.Button("Alert Rule"),
-                urwid.Button("Hunting"),
-                urwid.Button("Analytics"),
-            ],
-            dividechars=2,
-        )
-        urwid.WidgetWrap.__init__(self, urwid.AttrMap(w, "heading"))
+import urwid
+from azsctl.ui import signals
+from azsctl.ui.controller import Controller, RefreshableItems
+from azsctl.ui.statusbar import StatusBar
+from azsctl.ui.tabs import TabItem, TabPanel
+from azsctl.ui.widgets import SentinelItemList, SentinelItemListWalker
+from azsctl.ui.ruleview import RuleItem
+from azsctl.ui.incidentview import IncidentItem
 
 
 class Window(urwid.Frame):
@@ -27,18 +15,38 @@ class Window(urwid.Frame):
         self.controller = controller
         signals.focus.connect(self.signal_focus)
 
-        def retrieval_method():
+        def rule_retrieval_method():
             return [
                 urwid.AttrMap(RuleItem(rule), None, focus_map="focus")
                 for rule in self.controller.get_alert_rules()
             ]
 
+        def incident_retrieval_method():
+            return [
+                urwid.AttrMap(IncidentItem(incident), None, focus_map="focus")
+                for incident in self.controller.get_incidents()
+            ]
+
         tabs = [
-            TabItem("Incident", urwid.Pile([])),
+            TabItem(
+                "Incident",
+                urwid.AttrWrap(
+                    SentinelItemList(
+                        SentinelItemListWalker(
+                            RefreshableItems(incident_retrieval_method, [])
+                        )
+                    ),
+                    "background",
+                ),
+            ),
             TabItem(
                 "Alert rule",
                 urwid.AttrWrap(
-                    RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
+                    SentinelItemList(
+                        SentinelItemListWalker(
+                            RefreshableItems(rule_retrieval_method, [])
+                        )
+                    ),
                     "background",
                 ),
             ),
@@ -48,7 +56,6 @@ class Window(urwid.Frame):
         ]
 
         super().__init__(
-            # RuleList(RuleListWalker(RefreshableItems(retrieval_method, []))),
             TabPanel(tabs),
             footer=urwid.AttrWrap(self.statusbar, "background"),
         )
