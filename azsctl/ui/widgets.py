@@ -13,7 +13,7 @@ class SentinelItemListWalker(urwid.ListWalker):
         self.retriever = retriever
         self.items = retriever.items
         self.focus = 0
-
+        
     def get_focus(self):
         return self._get_at_pos(self.focus)
 
