@@ -5,10 +5,11 @@ import urwid
 class AzsctlUI:
     def __init__(self) -> None:
         palette = [
-            ("background", "", "", "", "", "#073642"),
+            ("background", "", "", "", "", "h245"),
+            ("body", "", "", "", "h254", "h235")
         ]
         self.window = Window()
-        self.loop = urwid.MainLoop(self.window, palette=palette, unhandled_input=self.unhandled_input)
+        self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input)
         self.loop.screen.set_terminal_properties(colors=256)
 
     def unhandled_input(self, key):
