@@ -10,6 +10,7 @@ from knack.arguments import ArgumentsContext, CLIArgumentType
 from knack.help import CLIHelp
 from knack.help_files import helps
 from azsctl.ui import AzsctlUI
+from azsctl.ui.controller import Controller
 
 
 def login():
@@ -49,7 +50,7 @@ def select_workspace():
     current_config.set_workspace(workspace["name"], workspace["id"])
 
 def show_ui():
-    ui = AzsctlUI()
+    ui = AzsctlUI(Controller())
     ui.run()
 
 helps[

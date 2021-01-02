@@ -1,16 +1,19 @@
 from azsctl.ui.window import Window
 from azsctl.ui import signals
+from .controller import Controller
 import urwid
 
 
 class AzsctlUI:
-    def __init__(self) -> None:
+    def __init__(self, controller : Controller) -> None:
         palette = [
             ("background", "", "black"),
             ("body", "","black"),
-            ("heading", "white", "dark blue")
+            ("heading", "white", "dark blue"),
+            ("focus", "light magenta", "black")
         ]
-        self.window = Window()
+        self.controller = controller
+        self.window = Window(controller)
         self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input)
         self.loop.screen.set_terminal_properties(colors=256)
         signals.delayed_signal.connect(self.signal_delayed)
