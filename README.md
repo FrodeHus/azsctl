@@ -12,6 +12,10 @@ Tried to make it as simple as possible so... try:
 
 (Won't work right now since I'm since working towards a stable first release)
 
+### Enable tab completion
+
+`source azsctl.completion.sh`
+
 ## Usage
 
 `azsctl login` to get started.

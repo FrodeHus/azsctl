@@ -4,6 +4,7 @@ setuptools.setup(
     name="azsctl",
     version="1.0",
     packages=setuptools.find_packages(),
+    scripts=['azsctl.completion.sh'],
     entry_points={"console_scripts": ["azsctl=azsctl.__main__:main"]},
     author="Frode Hus",
     author_email="frode.hus@outlook.com",
