@@ -65,7 +65,7 @@ class AzureSentinelApi(BaseApi):
         """
         Gets all Azure Sentinel incidents
         """
-        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01"
+        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01&$orderby=properties/createdTimeUtc desc&$filter=properties/status ne 'Closed'"
         incidents = self.get(endpoint)
         return incidents["value"]
 

@@ -9,6 +9,8 @@ from knack.commands import CLICommandsLoader, CommandGroup
 from knack.arguments import ArgumentsContext, CLIArgumentType
 from knack.help import CLIHelp
 from knack.help_files import helps
+from azsctl.ui import AzsctlUI
+from azsctl.ui.controller import Controller
 
 
 def login():
@@ -47,6 +49,10 @@ def select_workspace():
     )[0]
     current_config.set_workspace(workspace["name"], workspace["id"])
 
+def show_ui():
+    ui = AzsctlUI(Controller())
+    ui.run()
+
 helps[
     "login"
 ] = """
@@ -79,6 +85,7 @@ class CommandLoader(CLICommandsLoader):
         with CommandGroup(self, "", "azsctl.__main__#{}") as g:
             g.command("login", "login")
             g.command("select-workspace", "select_workspace")
+            g.command("ui", "show_ui")
         with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
             g.command("list", "list_incidents")
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
@@ -114,5 +121,9 @@ cli = CLI(
     commands_loader_cls=CommandLoader,
     help_cls=Help,
 )
-exit_code = cli.invoke(sys.argv[1:])
-sys.exit(exit_code)
+
+if len(sys.argv) == 1:
+    show_ui()
+else:    
+    exit_code = cli.invoke(sys.argv[1:])
+    sys.exit(exit_code)

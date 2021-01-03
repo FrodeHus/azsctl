@@ -3,7 +3,7 @@ from azsctl.api import AzureSentinelApi
 from azsctl.validators import ScheduledRuleValidator
 import yaml
 from azsctl.commands.analytics import execute_query
-
+from azsctl.ui import ItemList
 
 def list_rules():
     """
