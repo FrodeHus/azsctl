@@ -121,5 +121,9 @@ cli = CLI(
     commands_loader_cls=CommandLoader,
     help_cls=Help,
 )
-exit_code = cli.invoke(sys.argv[1:])
-sys.exit(exit_code)
+
+if len(sys.argv) == 1:
+    show_ui()
+else:    
+    exit_code = cli.invoke(sys.argv[1:])
+    sys.exit(exit_code)
