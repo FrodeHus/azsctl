@@ -77,7 +77,7 @@ class AzureSentinelApi(BaseApi):
     
     def get_incident_alerts(self, incident_id : str):
         endpoint = f"{self._endpoint}/incidents/{incident_id}/alerts?api-version=2019-01-01-preview"
-        alerts = self.get(endpoint)
+        alerts = self.post(endpoint, payload=None)
         return alerts["value"]
 
     def get_alert(self, alert_id : str):
