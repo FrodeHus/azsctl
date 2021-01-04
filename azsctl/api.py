@@ -19,7 +19,7 @@ class BaseApi:
         try:
             result = requests.get(
                 f"{base_url}/{path}",
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             ).json()
             return result
         except Exception as error:
@@ -31,7 +31,7 @@ class BaseApi:
             result = requests.post(
                 f"{url}/{path}",
                 data=json.dumps(payload),
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             )
             return result.json()
         except Exception as error:
@@ -43,7 +43,7 @@ class BaseApi:
             result = requests.put(
                 f"{url}/{path}",
                 json=payload,
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             )
 
             if result.status_code != 200:
@@ -54,7 +54,8 @@ class BaseApi:
             print(error)
             sys.exit(1)
 
-
+    def _get_authorization_header(self):
+        return "Bearer " + self.get_access_token()
 class AzureSentinelApi(BaseApi):
     def __init__(self):
         super().__init__()
@@ -69,6 +70,37 @@ class AzureSentinelApi(BaseApi):
         incidents = self.get(endpoint)
         return incidents["value"]
 
+    def get_incident(self, id : str):
+        endpoint = f"{self._endpoint}incidents/{id}?api-version=2020-01-01"
+        incident = self.get(endpoint)
+        return incident
+    
+    def get_incident_alerts(self, incident_id : str):
+        endpoint = f"{self._endpoint}/incidents/{incident_id}/alerts?api-version=2019-01-01-preview"
+        alerts = self.get(endpoint)
+        return alerts["value"]
+
+    def get_alert(self, alert_id : str):
+        analytics = AzureLogAnalytics()
+        result = analytics.execute_query(f"SecurityAlert | where SystemAlertId == \"{alert_id}\"")
+        alert = table_to_dict(result)
+        if not alert:
+            return
+        return alert[0]
+
+    def get_alert_events(self, alert_id : str):
+        analytics = AzureLogAnalytics()
+        alert = self.get_alert(alert_id)
+        if not alert:
+            return
+
+        props_raw = alert["ExtendedProperties"]
+        props = json.loads(props_raw)
+        start_time = alert["StartTime"]
+        end_time = alert["EndTime"]
+        result = analytics.execute_query(props["Query"], timespan=f"{start_time}/{end_time}")
+        return table_to_dict(result)
+        
     def get_alert_rule(self, rule_id: str):
         """
         Get alert rule by id
@@ -126,7 +158,33 @@ class AzureLogAnalytics(BaseApi):
         _, workspace_id = current_config.get_workspace()
         self._endpoint = workspace_id
 
-    def execute_query(self, query: str):
+    def execute_query(self, query: str, timespan : str = None):
         data = {"query": query}
+        if timespan:
+            data["timespan"] = timespan
+
         result = self.post(f"{self._endpoint}/api/query?api-version=2020-08-01", data)
         return result
+
+    def list_datasources(self):
+        _, workspace_id = current_config.get_workspace()
+        endpoint = f"{workspace_id}/dataSources?$filter=kind eq 'CustomLog'&api-version=2020-08-01"
+        result = self.get(endpoint)
+        return result["value"]
+
+def table_to_dict(table_result):
+    if not "Tables" in table_result:
+        return
+
+    table = table_result["Tables"][0]
+    rows = []
+    keys = []
+    for column in table["Columns"]:
+        keys.append(column["ColumnName"])
+
+    if len(table["Rows"]) == 0:
+        return dict.fromkeys(keys)
+    for row in table["Rows"]:
+        result_row = dict(zip(keys, row))
+        rows.append(result_row)
+    return rows

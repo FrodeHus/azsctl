@@ -18,3 +18,7 @@ def execute_query(kql : str):
         result_row = dict(zip(keys, row))
         rows.append(result_row)
     return rows
+
+def list_datasources():
+    api = AzureLogAnalytics()
+    return api.list_datasources()

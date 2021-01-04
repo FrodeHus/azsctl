@@ -25,6 +25,7 @@ Group
     azsctl
 
 Subgroups:
+    alert            : Work with Azure Sentinel alerts.
     analytics        : Query data in your log analytics workspace.
     incident         : Work with Azure Sentinel incidents.
     rule             : Add/edit/view/delete/import Azure Sentinel alert rules.
@@ -34,6 +35,7 @@ Commands:
     login            : Log in to your Azure subscription and select which workspace to user with
                        Sentinel.
     select-workspace
+    ui
 
 ```
 
