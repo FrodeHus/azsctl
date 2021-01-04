@@ -9,7 +9,7 @@ setuptools.setup(
     author="Frode Hus",
     author_email="frode.hus@outlook.com",
     description="Simple tool that lets you work with Azure Sentinel",
-    url="https://www.frodehus.dev",
+    url="https://github.com/frodehus/azsctl",
     python_requires=">=3.6",
     install_requires=["requests", "knack", "msal", "alive_progress", "pyinquirer", "urwid"],
     classifiers=[
