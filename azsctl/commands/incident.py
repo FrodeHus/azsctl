@@ -41,4 +41,3 @@ def get_incident_events(id : str):
         events = events + alert_events
     
     return events
-
