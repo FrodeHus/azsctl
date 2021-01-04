@@ -19,7 +19,7 @@ class BaseApi:
         try:
             result = requests.get(
                 f"{base_url}/{path}",
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             ).json()
             return result
         except Exception as error:
@@ -31,7 +31,7 @@ class BaseApi:
             result = requests.post(
                 f"{url}/{path}",
                 data=json.dumps(payload),
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             )
             return result.json()
         except Exception as error:
@@ -43,7 +43,7 @@ class BaseApi:
             result = requests.put(
                 f"{url}/{path}",
                 json=payload,
-                headers={"Authorization": "Bearer " + self.get_access_token()},
+                headers={"Authorization": self._get_authorization_header()},
             )
 
             if result.status_code != 200:
@@ -54,7 +54,8 @@ class BaseApi:
             print(error)
             sys.exit(1)
 
-
+    def _get_authorization_header(self):
+        return "Bearer " + self.get_access_token()
 class AzureSentinelApi(BaseApi):
     def __init__(self):
         super().__init__()

@@ -65,6 +65,11 @@ type: group
 short-summary: Work with Azure Sentinel incidents
 """
 
+helps["alert"] = """
+type: group
+short-summary: Work with Azure Sentinel alerts
+"""
+
 helps["rule"] = """
 type: group
 short-summary: Add/edit/view/delete/import Azure Sentinel alert rules
