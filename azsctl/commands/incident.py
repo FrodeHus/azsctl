@@ -1,9 +1,9 @@
 import sys
 from azsctl import current_config
 from azsctl.api import AzureSentinelApi
+from azsctl.auth import TokenRequester
 
-
-def list_incidents(filter : str = "properties/status ne 'Closed'"):
+def list_incidents(only_assigned : bool = False, filter : str = "properties/status ne 'Closed'"):
     """
     Retrieves a list of incidents (default: non-closed)
     """
@@ -12,8 +12,11 @@ def list_incidents(filter : str = "properties/status ne 'Closed'"):
         print("No workspace selected - try azsctl select-workspace")
         sys.exit(1)
     api = AzureSentinelApi()
-    return api.get_incidents(filter)
+    if only_assigned:
+        _, user_id = TokenRequester().get_current_user()
+        filter = f"{filter} and properties/owner/objectId eq '{user_id}'"
 
+    return api.get_incidents(filter)
 
 def get_incident(id: str):
     """

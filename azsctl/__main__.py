@@ -120,6 +120,8 @@ class CommandLoader(CLICommandsLoader):
     def load_arguments(self, command):
         with ArgumentsContext(self, 'rule import') as ac:
             ac.argument('validate-only', type=bool)
+        with ArgumentsContext(self, 'incident list') as ac:
+            ac.argument('only-assigned', type=bool)
         super(CommandLoader, self).load_arguments(command)
 
 
