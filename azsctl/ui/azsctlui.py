@@ -15,7 +15,7 @@ class AzsctlUI:
         ]
         self.controller = controller
         self.window = Window(controller)
-        self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input)
+        self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input, pop_ups=True)
         self.loop.screen.set_terminal_properties(colors=256)
         signals.delayed_signal.connect(self.signal_delayed)
 

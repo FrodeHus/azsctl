@@ -88,14 +88,20 @@ class CommandLoader(CLICommandsLoader):
             g.command("ui", "show_ui")
         with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
             g.command("list", "list_incidents")
+            g.command("show", "get_incident")
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
             g.command("list", "list_rules")
             g.command("show", "get_rule")
             g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
             g.command("import", "import_rule", confirmation=True)
+        with CommandGroup(self, "alert", "azsctl.commands.alert#{}") as g:
+            g.command("show", "get_alert")
+            g.command("events", "get_alert_events")
         with CommandGroup(self, "analytics", "azsctl.commands.analytics#{}") as g:
             g.command("query", "execute_query")
+        with CommandGroup(self, "analytics datasource", "azsctl.commands.analytics#{}") as g:
+            g.command("list", "list_datasources")
         with CommandGroup(self, "workspace", "azsctl.commands.workspace#{}") as g:
             g.command("show", "show_workspace")
             g.command("list", "list_workspaces")
