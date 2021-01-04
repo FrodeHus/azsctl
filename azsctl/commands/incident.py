@@ -3,16 +3,16 @@ from azsctl import current_config
 from azsctl.api import AzureSentinelApi
 
 
-def list_incidents():
+def list_incidents(filter : str = "properties/status ne 'Closed'"):
     """
-    Retrieves all non-closed incidents
+    Retrieves a list of incidents (default: non-closed)
     """
     _, workspace_id = current_config.get_workspace()
     if not workspace_id:
         print("No workspace selected - try azsctl select-workspace")
         sys.exit(1)
     api = AzureSentinelApi()
-    return api.get_incidents()
+    return api.get_incidents(filter)
 
 
 def get_incident(id: str):

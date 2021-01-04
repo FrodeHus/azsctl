@@ -62,11 +62,11 @@ class AzureSentinelApi(BaseApi):
         _, workspace_id = current_config.get_workspace()
         self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"
 
-    def get_incidents(self):
+    def get_incidents(self, filter : str):
         """
         Gets all Azure Sentinel incidents
         """
-        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01&$orderby=properties/createdTimeUtc desc&$filter=properties/status ne 'Closed'"
+        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01&$orderby=properties/createdTimeUtc desc&$filter={filter}"
         incidents = self.get(endpoint)
         return incidents["value"]
 
