@@ -93,6 +93,7 @@ class CommandLoader(CLICommandsLoader):
             g.command("ui", "show_ui")
         with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
             g.command("list", "list_incidents")
+            g.command("alerts", "get_incident_alerts")
             g.command("show", "get_incident")
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
             g.command("list", "list_rules")

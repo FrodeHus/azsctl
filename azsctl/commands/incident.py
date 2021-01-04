@@ -15,3 +15,7 @@ def list_incidents():
 def get_incident(id: str):
     api = AzureSentinelApi()
     return api.get_incident(id)
+
+def get_incident_alerts(id : str):
+    api = AzureSentinelApi()
+    return api.get_incident_alerts(id)
