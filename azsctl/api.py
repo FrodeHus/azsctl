@@ -82,21 +82,10 @@ class AzureSentinelApi(BaseApi):
     def get_alert(self, alert_id : str):
         analytics = AzureLogAnalytics()
         result = analytics.execute_query(f"SecurityAlert | where SystemAlertId == \"{alert_id}\"")
-        if not "Tables" in result:
-            return None
-        
-        table = result["Tables"][0]
-        rows = []
-        keys = []
-        for column in table["Columns"]:
-            keys.append(column["ColumnName"])
-
-        if len(table["Rows"]) == 0:
-            return dict.fromkeys(keys)
-        for row in table["Rows"]:
-            result_row = dict(zip(keys, row))
-            rows.append(result_row)
-        return rows[0]
+        alert = table_to_dict(result)
+        if not alert:
+            return
+        return alert[0]
 
     def get_alert_events(self, alert_id : str):
         analytics = AzureLogAnalytics()
