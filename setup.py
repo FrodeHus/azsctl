@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="azsctl",
-    version="0.1.1",
+    version="0.2",
     packages=setuptools.find_packages(),
     scripts=['azsctl.completion.sh'],
     entry_points={"console_scripts": ["azsctl=azsctl.__main__:main"]},

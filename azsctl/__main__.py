@@ -4,7 +4,7 @@ from textwrap import indent
 from azsctl.api import AzureManagementApi, AzureSentinelApi
 from PyInquirer import prompt
 from azsctl import current_config
-from knack import CLI
+from knack import CLI, experimental
 from knack.commands import CLICommandsLoader, CommandGroup
 from knack.arguments import ArgumentsContext, CLIArgumentType
 from knack.help import CLIHelp
@@ -50,6 +50,9 @@ def select_workspace():
     current_config.set_workspace(workspace["name"], workspace["id"])
 
 def show_ui():
+    """
+    Opens interactive UI
+    """
     ui = AzsctlUI(Controller())
     ui.run()
 
@@ -90,10 +93,11 @@ class CommandLoader(CLICommandsLoader):
         with CommandGroup(self, "", "azsctl.__main__#{}") as g:
             g.command("login", "login")
             g.command("select-workspace", "select_workspace")
-            g.command("ui", "show_ui")
+            g.command("ui", "show_ui", is_experimental=True)
         with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
             g.command("list", "list_incidents")
             g.command("alerts", "get_incident_alerts")
+            g.command("alert-events", "get_incident_events")
             g.command("show", "get_incident")
         with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
             g.command("list", "list_rules")
