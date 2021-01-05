@@ -110,6 +110,8 @@ class CommandLoader(CLICommandsLoader):
         with CommandGroup(self, "alert", "azsctl.commands.alert#{}") as g:
             g.command("show", "get_alert")
             g.command("events", "get_alert_events")
+        with CommandGroup(self, "dataconnector", "azsctl.commands.dataconnector#{}") as g:
+            g.command("list", "list_data_connectors")
         with CommandGroup(self, "analytics", "azsctl.commands.analytics#{}") as g:
             g.command("query", "execute_query")
         with CommandGroup(self, "analytics datasource", "azsctl.commands.analytics#{}") as g:

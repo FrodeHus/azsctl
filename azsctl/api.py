@@ -1,3 +1,4 @@
+from azsctl.classes import AlertRuleKind
 from azsctl import current_config
 import requests
 import sys
@@ -125,8 +126,13 @@ class AzureSentinelApi(BaseApi):
     def list_alert_rule_templates(self):
         endpoint = f"{self._endpoint}/alertRuleTemplates?api-version=2020-01-01"
         result = self.get(endpoint)
-        return result
-        
+        return result["value"]
+
+    def list_data_connectors(self):
+        endpoint = f"{self._endpoint}/dataConnectors?api-version=2020-01-01"
+        result = self.get(endpoint)
+        return result["value"]
+
 class AzureManagementApi(BaseApi):
     def __init__(self):
         super().__init__()

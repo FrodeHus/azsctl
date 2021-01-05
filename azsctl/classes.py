@@ -4,6 +4,12 @@ from typing import List
 from enum import Enum
 
 
+class AlertRuleKind(Enum):
+    FUSION = "Fusion"
+    MICROSOFT_SECURITY_INCIDENT_CREATION = "MicrosoftSecurityIncidentCreation"
+    SCHEDULED = "Scheduled"
+
+
 class IncidentClassificationReason(Enum):
     INACCURATE_DATA = "InaccurateData"
     INCORRECT_ALERT_LOGIC = "IncorrectAlertLogic"
@@ -50,11 +56,89 @@ class TriggerOperator(Enum):
     LESS_THAN = "LessThan"
     NOT_EQUAL = "NotEqual"
 
+class ScheduledAlertRule:
+    def __init__(self, values: dict = None):
+        self.kind = AlertRuleKind.SCHEDULED
+        self.properties = {}
+        if values:
+            self.__dict__ = values
 
+    @property
+    def display_name(self):
+        return self.properties["displayName"]
+
+    @display_name.setter
+    def display_name(self, value):
+        self.properties["displayName"] = value
+
+    @property
+    def description(self):
+        return self.properties["description"]
+
+    @description.setter
+    def description(self, value):
+        self.properties["description"] = value
+
+    @property
+    def query(self):
+        return self.properties["query"]
+
+    @query.setter
+    def query(self, value):
+        self.properties["query"] = value
+
+    @property
+    def query_period(self):
+        return self.properties["queryPeriod"]
+
+    @query_period.setter
+    def query_period(self, value):
+        self.properties["queryPeriod"] = value
+
+    @property
+    def query_frequency(self):
+        return self.properties["queryFrequency"]
+
+    @query_frequency.setter
+    def query_frequency(self, value):
+        self.properties["queryFrequency"] = value
+
+    @property
+    def severity(self):
+        return self.properties["severity"]
+
+    @severity.setter
+    def severity(self, value: AlertSeverity):
+        self.properties["severity"] = value
+
+    @property
+    def trigger_operator(self) -> TriggerOperator:
+        return self.properties["triggerOperator"]
+
+    @trigger_operator.setter
+    def trigger_operator(self, value: TriggerOperator):
+        self.properties["triggerOperator"] = value
+
+    @property
+    def trigger_threshold(self):
+        return self.properties["triggerThreshold"]
+
+    @trigger_threshold.setter
+    def trigger_threshold(self, value: int):
+        self.properties["triggerThreshold"] = value
+
+    @property
+    def tactics(self) -> List[str]:
+        return self.properties["tactics"]
+
+    @tactics.setter
+    def tactics(self, value: List[str]):
+        self.properties["tactics"] = value
+        
 class ScheduledAlertRuleTemplate:
-    def __init__(self, values : dict = None):
+    def __init__(self, values: dict = None):
         self.id = None
-        self.kind = "Scheduled"
+        self.kind = AlertRuleKind.SCHEDULED
         self.name = None
         self.type = "Microsoft.SecurityInsights/AlertRuleTemplates"
         self.properties = {}
