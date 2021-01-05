@@ -65,6 +65,15 @@ class ScheduledAlertRule:
         if values:
             self.__dict__ = values
 
+    @staticmethod
+    def from_template(template):
+        rule = ScheduledAlertRule()
+        rule.name = uuid.uuid4()
+        rule.alert_rule_template_name = template.name
+        rule.display_name = template.display_name
+        rule.enabled = True
+        return rule
+
     @property
     def alert_rule_template_name(self):
         return self.properties["alertRuleTemplateName"]
