@@ -1,8 +1,10 @@
+import json
 from PyInquirer.prompt import prompt
 from azsctl.api import AzureSentinelApi
 from azsctl.validators import ScheduledRuleValidator
 import yaml
 from azsctl.commands.analytics import execute_query
+from azsctl.classes import ScheduledAlertRuleTemplate
 
 def list_rules():
     """
@@ -67,13 +69,9 @@ def import_rule(file: str, validate_only: bool = False):
     Import alert rule from YAML
     """
     with open(file, "r") as f:
-        documents = yaml.full_load(f)
+        document = yaml.full_load(f)
 
-    validation_results = {}
-    for item, doc in documents.items():
-        validation_results[f"rule_{item}"] = validate_rule(doc)
-    if validate_only:
-        return validation_results
+    return ScheduledAlertRuleTemplate.from_yaml_template(document)
 
 
 def validate_rule(rule: dict):
@@ -95,3 +93,7 @@ def select_rule():
         list(filter(lambda x: x["properties"]["displayName"] == answer["rule"], rules))
     )[0]
     return rule_id["name"]
+
+def list_alert_rule_templates():
+    api = AzureSentinelApi()
+    return api.list_alert_rule_templates()

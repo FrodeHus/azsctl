@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "azsctl",
-            "args": ["ui"]
+            "args": ["rule", "import", "--file", "/home/frode/src/github.com/azure/azure-sentinel/Detections/AzureActivity/New-CloudShell-User.yaml"]
         }
     ]
 }

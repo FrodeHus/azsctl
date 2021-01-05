@@ -122,6 +122,11 @@ class AzureSentinelApi(BaseApi):
         result = self.put(endpoint, rule)
         return result
 
+    def list_alert_rule_templates(self):
+        endpoint = f"{self._endpoint}/alertRuleTemplates?api-version=2020-01-01"
+        result = self.get(endpoint)
+        return result
+        
 class AzureManagementApi(BaseApi):
     def __init__(self):
         super().__init__()

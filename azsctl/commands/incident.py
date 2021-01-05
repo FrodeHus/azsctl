@@ -13,7 +13,7 @@ def list_incidents(only_assigned : bool = False, filter : str = "properties/stat
         sys.exit(1)
     api = AzureSentinelApi()
     if only_assigned:
-        _, user_id = TokenRequester().get_current_user()
+        _, user_id = TokenRequester().get_current_user()        
         filter = f"{filter} and properties/owner/objectId eq '{user_id}'"
 
     return api.get_incidents(filter)

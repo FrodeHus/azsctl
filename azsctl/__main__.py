@@ -105,6 +105,8 @@ class CommandLoader(CLICommandsLoader):
             g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
             g.command("import", "import_rule", confirmation=True)
+        with CommandGroup(self, "rule template", "azsctl.commands.rule#{}") as g:
+            g.command("list", "list_alert_rule_templates")
         with CommandGroup(self, "alert", "azsctl.commands.alert#{}") as g:
             g.command("show", "get_alert")
             g.command("events", "get_alert_events")
