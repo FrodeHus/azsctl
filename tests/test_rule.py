@@ -1,3 +1,4 @@
+from azsctl.classes import ScheduledAlertRuleTemplate
 import unittest
 from unittest import mock
 import yaml
@@ -53,22 +54,25 @@ entityMappings:
 
 class RuleTests(unittest.TestCase):
     def test_rule_validation(self):
-        rule = yaml.full_load(test_rule)
+        doc = yaml.full_load(test_rule)
+        rule = ScheduledAlertRuleTemplate.from_yaml_template(doc)
         validator = ScheduledRuleValidator(rule)
         result = validator.validate()
         self.assertTrue(result)
 
 class ValidatorTests(unittest.TestCase):
-    def test_id_validation(self):
-        rule = yaml.full_load(test_rule)
-        validator = ScheduledRuleValidator(rule)
-        result = validator._validate_id()
-        self.assertTrue(result)  
-
     def test_name_validation(self):
-        rule = yaml.full_load(test_rule)
+        doc = yaml.full_load(test_rule)
+        rule = ScheduledAlertRuleTemplate.from_yaml_template(doc)
         validator = ScheduledRuleValidator(rule)
         result = validator._validate_name()
+        self.assertTrue(result)  
+
+    def test_display_name_validation(self):
+        doc = yaml.full_load(test_rule)
+        rule = ScheduledAlertRuleTemplate.from_yaml_template(doc)
+        validator = ScheduledRuleValidator(rule)
+        result = validator._validate_display_name()
         self.assertTrue(result)
 
 

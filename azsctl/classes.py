@@ -1,4 +1,5 @@
 import datetime
+import uuid
 import dateutil
 from typing import List
 from enum import Enum
@@ -59,9 +60,18 @@ class TriggerOperator(Enum):
 class ScheduledAlertRule:
     def __init__(self, values: dict = None):
         self.kind = AlertRuleKind.SCHEDULED
+        self.etag = None
         self.properties = {}
         if values:
             self.__dict__ = values
+
+    @property
+    def alert_rule_template_name(self):
+        return self.properties["alertRuleTemplateName"]
+    
+    @alert_rule_template_name.setter
+    def alert_rule_template_name(self, value):
+        self.properties["alertRuleTemplateName"] = value
 
     @property
     def display_name(self):
@@ -134,11 +144,11 @@ class ScheduledAlertRule:
     @tactics.setter
     def tactics(self, value: List[str]):
         self.properties["tactics"] = value
-        
-class ScheduledAlertRuleTemplate:
+
+class ScheduledAlertRuleTemplate(ScheduledAlertRule):
     def __init__(self, values: dict = None):
+        super().__init__(values)
         self.id = None
-        self.kind = AlertRuleKind.SCHEDULED
         self.name = None
         self.type = "Microsoft.SecurityInsights/AlertRuleTemplates"
         self.properties = {}
@@ -165,8 +175,12 @@ class ScheduledAlertRuleTemplate:
             return value
 
         template = ScheduledAlertRuleTemplate()
-        template.name = read_value(values, "name")
-        template.id = read_value(values, "id")
+        template_id = read_value(values, "id")
+        from azsctl import current_config
+        _, workspace_id = current_config.get_workspace()
+        template.id = f"{workspace_id}/alertRules/{template_id}"
+        template.display_name = read_value(values, "name")
+        template.name = template_id
         template.description = read_value(values, "description")
         template.severity = read_value(values, "severity")
         template.query_frequency = read_value(values, "queryFrequency")
@@ -187,53 +201,6 @@ class ScheduledAlertRuleTemplate:
     def created_date(self, value: datetime.datetime):
         self.properties["createdDateUTC"] = value
 
-    @property
-    def display_name(self):
-        return self.properties["displayName"]
-
-    @display_name.setter
-    def display_name(self, value):
-        self.properties["displayName"] = value
-
-    @property
-    def description(self):
-        return self.properties["description"]
-
-    @description.setter
-    def description(self, value):
-        self.properties["description"] = value
-
-    @property
-    def query(self):
-        return self.properties["query"]
-
-    @query.setter
-    def query(self, value):
-        self.properties["query"] = value
-
-    @property
-    def query_period(self):
-        return self.properties["queryPeriod"]
-
-    @query_period.setter
-    def query_period(self, value):
-        self.properties["queryPeriod"] = value
-
-    @property
-    def query_frequency(self):
-        return self.properties["queryFrequency"]
-
-    @query_frequency.setter
-    def query_frequency(self, value):
-        self.properties["queryFrequency"] = value
-
-    @property
-    def severity(self):
-        return self.properties["severity"]
-
-    @severity.setter
-    def severity(self, value: AlertSeverity):
-        self.properties["severity"] = value
 
     @property
     def status(self):
@@ -242,30 +209,6 @@ class ScheduledAlertRuleTemplate:
     @status.setter
     def status(self, value: TemplateStatus):
         self.properties["status"] = value
-
-    @property
-    def trigger_operator(self) -> TriggerOperator:
-        return self.properties["triggerOperator"]
-
-    @trigger_operator.setter
-    def trigger_operator(self, value: TriggerOperator):
-        self.properties["triggerOperator"] = value
-
-    @property
-    def trigger_threshold(self):
-        return self.properties["triggerThreshold"]
-
-    @trigger_threshold.setter
-    def trigger_threshold(self, value: int):
-        self.properties["triggerThreshold"] = value
-
-    @property
-    def tactics(self) -> List[str]:
-        return self.properties["tactics"]
-
-    @tactics.setter
-    def tactics(self, value: List[str]):
-        self.properties["tactics"] = value
 
     @property
     def alert_rules_created_by_template(self):
