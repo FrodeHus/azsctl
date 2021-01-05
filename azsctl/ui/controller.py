@@ -12,7 +12,7 @@ class Controller:
         return rules
 
     def get_incidents(self):
-        incidents = self.sentinel_api.get_incidents()
+        incidents = self.sentinel_api.get_incidents("properties/status ne 'Closed'")
         return incidents
 
 
