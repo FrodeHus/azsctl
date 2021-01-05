@@ -1,6 +1,7 @@
 import urwid
 from azsctl.ui import signals
 from azsctl import current_config
+from azsctl.auth import TokenRequester
 
 class CommandPrompt(urwid.Edit):
     def keypress(self, size, key):
@@ -54,6 +55,7 @@ class StatusBar(urwid.WidgetWrap):
     def __init__(self):
         self.infobar = urwid.WidgetWrap(urwid.Text(""))
         self.actionbar = ActionBar()
+        self.current_user, _ = TokenRequester().get_current_user()
         super().__init__(urwid.Pile([self.infobar, self.actionbar]))
         self.refresh()
     
@@ -64,7 +66,7 @@ class StatusBar(urwid.WidgetWrap):
     def redraw(self):
         workspace,_ = current_config.get_workspace()
         status = urwid.AttrWrap(urwid.Columns([
-            urwid.Text("Azure Sentinel Control"),
+            urwid.Text(self.current_user),
             urwid.Text(workspace, align="right"),
         ]), "heading")
         self.infobar._w = status
