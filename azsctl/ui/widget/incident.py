@@ -10,6 +10,15 @@ class IncidentView(urwid.WidgetWrap):
         urwid.connect_signal(self.main_list, "item_selected", self.handle_item_selected)
         urwid.WidgetWrap.__init__(self, self.main_list)
 
+    def keypress(self, size, key):
+        if key in ('esc'):
+            self.hide_incident()
+
+        return key
+
+    def hide_incident(self):
+        self._w = self.main_list
+
     def load_incidents(self):
         incidents = self.api.get_incidents("properties/status ne 'Closed'")
         return [
