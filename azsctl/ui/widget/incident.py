@@ -1,4 +1,7 @@
+from azsctl.ui.widget.tabs import TabPanel, TabItem
 import json
+
+from urwid.widget import Divider
 from azsctl.ui.widget.list import SentinelItemList
 from azsctl.api import AzureSentinelApi
 import urwid
@@ -32,8 +35,12 @@ class IncidentView(urwid.WidgetWrap):
         if not incident:
             return
         self.incident_detail = IncidentDetailView(incident)
+        tabs = TabPanel([
+            TabItem("Overview", self.incident_detail),
+            TabItem("Events", urwid.Pile([])),
+        ])
         self._w = urwid.Pile(
-            [self.main_list, self.incident_detail], focus_item=self.incident_detail
+            [self.main_list, tabs], 1
         )
 
     def handle_item_selected(self, sender, item):
@@ -43,11 +50,25 @@ class IncidentView(urwid.WidgetWrap):
 class IncidentDetailView(urwid.WidgetWrap):
     def __init__(self, incident):
         self.incident = incident
-        self._body = urwid.LineBox(
-            urwid.Filler(urwid.Text(json.dumps(incident, indent=2)), "middle")
-        )
+        self._body = self.header()
         self._frame = urwid.Frame(self._body)
         super().__init__(self._frame)
+
+    def header(self):
+        title = self.incident["properties"]["title"]
+        description = self.incident["properties"]["description"]
+        header = urwid.Filler(
+            urwid.LineBox(
+                urwid.Pile(
+                    [
+                        urwid.Text([('important',"Title:"),title]),
+                        urwid.Text([("important", "Description:"), description]),
+                    ]
+                )
+            ),
+            "top",
+        )
+        return header
 
     def selectable(self):
         return True
@@ -71,10 +92,10 @@ class IncidentItem(urwid.WidgetWrap):
             owner = "Unassigned"
         return urwid.Columns(
             [
-                ('weight', 4 , urwid.Text(self.data["properties"]["title"])),
-                ('weight', 1, urwid.Text(self.data["properties"]["severity"])),
-                ('weight', 1, urwid.Text(self.data["properties"]["status"])),
-                ('weight', 2, urwid.Text(owner)),
+                ("weight", 4, urwid.Text(self.data["properties"]["title"])),
+                ("weight", 1, urwid.Text(self.data["properties"]["severity"])),
+                ("weight", 1, urwid.Text(self.data["properties"]["status"])),
+                ("weight", 2, urwid.Text(owner)),
             ],
             dividechars=1,
         )
