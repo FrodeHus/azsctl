@@ -11,13 +11,20 @@ from azsctl.ui.widget import (
 
 
 class Window(urwid.Frame):
+    SIGNAL_VIEW_INCIDENTS = "view_incidents"
+    SIGNAL_VIEW_RULES = "view_rules"
+    SIGNAL_VIEW_HUNTING = "view_hunting"
+    SIGNAL_VIEW_THREATS = "view_threats"
+    SIGNAL_VIEW_ANALYTICS = "view_analytics"
+    SIGNALS = [SIGNAL_VIEW_INCIDENTS, SIGNAL_VIEW_RULES, SIGNAL_VIEW_HUNTING, SIGNAL_VIEW_THREATS, SIGNAL_VIEW_ANALYTICS]
     def __init__(self, controller: Controller):
+        urwid.register_signal(self.__class__, self.SIGNALS)
         self.statusbar = StatusBar([
-            ('F1', 'Incidents'),
-            ('F2', 'Alert rules'),
-            ('F3', 'Hunting'),
-            ('F4', 'Threat indicators'),
-            ('F5', 'Analytics'),
+            ('F1', 'Incidents', self.SIGNAL_VIEW_INCIDENTS),
+            ('F2', 'Alert rules', self.SIGNAL_VIEW_RULES),
+            ('F3', 'Hunting', self.SIGNAL_VIEW_HUNTING),
+            ('F4', 'Threat indicators', self.SIGNAL_VIEW_THREATS),
+            ('F5', 'Analytics', self.SIGNAL_VIEW_ANALYTICS),
         ])
         self.controller = controller
         signals.focus.connect(self.signal_focus)

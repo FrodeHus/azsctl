@@ -61,8 +61,21 @@ class IncidentEventView(urwid.WidgetWrap):
     def __init__(self, incident):
         self.api = AzureSentinelApi()
         self.incident = incident
-        self._body = self.prepare_view()
+        self._body = urwid.Filler(urwid.Text(["Press '",("important", "r"), "' to load events (could take a while)"], align="center"), 'middle')
+        self.is_first_view = True
         super().__init__(self._body)
+
+    def selectable(self):
+        return True
+
+    def keypress(self, size, key):
+        if key == "r" and self.is_first_view:
+            self._w = urwid.Filler(urwid.Text("Please wait...", align="center"), "middle")
+            self._body = self.prepare_view()
+            self._w = self._body
+            self.is_first_view = False
+        
+        return key
 
     def load_events(self):
         alerts = self.api.get_incident_alerts(self.incident["name"])

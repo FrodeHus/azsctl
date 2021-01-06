@@ -11,7 +11,7 @@ class AzsctlUI:
             ("body", "","black"),
             ("heading", "white", "dark blue"),
             ("heading inactive", "light gray", "light blue"),
-            ("focus", "light magenta", "light gray"),
+            ("focus", "","", "", "#fdf6e3", "#93a1a1"),
             ("actionbar:action", "white", "black"),
             ("important", 'dark blue','black',('standout','underline'))
         ]
