@@ -21,7 +21,8 @@ class IncidentView(urwid.WidgetWrap):
         if not incident:
             return
         
-        self._w = urwid.Pile([self.main_list, urwid.Text(json.dumps(incident, indent=2))])
+        self._w = urwid.Pile([self.main_list, urwid.LineBox(urwid.Filler(urwid.Text(json.dumps(incident, indent=2)), 'middle'))])
+        
 
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
