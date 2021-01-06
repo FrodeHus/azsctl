@@ -1,7 +1,6 @@
+from typing import Text
+from urwid.container import Columns
 from azsctl.ui.widget.tabs import TabPanel, TabItem
-import json
-
-from urwid.widget import Divider
 from azsctl.ui.widget.list import SentinelItemList
 from azsctl.api import AzureSentinelApi
 import urwid
@@ -11,17 +10,25 @@ class IncidentView(urwid.WidgetWrap):
     def __init__(self):
         self.api = AzureSentinelApi()
         self.main_list = SentinelItemList(self.load_incidents)
+        self.show_detail = False
         urwid.connect_signal(self.main_list, "item_selected", self.handle_item_selected)
         urwid.WidgetWrap.__init__(self, self.main_list)
 
     def keypress(self, size, key):
         if key in ("esc"):
             self.hide_incident()
+        if key == "tab" and self.show_detail:
+            self.switch_focus()
         return super().keypress(size, key)
 
+    def switch_focus(self):
+        self.detail_view.focus_position = (
+            0 if self.detail_view.focus_position == 1 else 1
+        )
+
     def hide_incident(self):
-        if self.incident_detail:
-            self.incident_detail = None
+        self.show_detail = False
+        del self.detail_view
         self._w = self.main_list
 
     def load_incidents(self):
@@ -34,14 +41,17 @@ class IncidentView(urwid.WidgetWrap):
     def show_incident(self, incident):
         if not incident:
             return
-        self.incident_detail = IncidentDetailView(incident)
-        tabs = TabPanel([
-            TabItem("Overview", self.incident_detail),
-            TabItem("Events", urwid.Pile([])),
-        ])
-        self._w = urwid.Pile(
-            [self.main_list, tabs], 1
+        self.show_detail = True
+        incident_detail = IncidentDetailView(incident)
+        tabs = TabPanel(
+            [
+                TabItem("Overview", incident_detail),
+                TabItem("Events", urwid.Pile([])),
+            ]
         )
+        self.detail_view = urwid.Pile([self.main_list, tabs], 1)
+
+        self._w = self.detail_view
 
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
@@ -57,12 +67,49 @@ class IncidentDetailView(urwid.WidgetWrap):
     def header(self):
         title = self.incident["properties"]["title"]
         description = self.incident["properties"]["description"]
+        severity = self.incident["properties"]["severity"]
+        status = self.incident["properties"]["status"]
+        owner = self.incident["properties"]["owner"]["userPrincipalName"]
+        if not owner:
+            owner = "Unassigned"
         header = urwid.Filler(
             urwid.LineBox(
                 urwid.Pile(
                     [
-                        urwid.Text([('important',"Title:"),title]),
-                        urwid.Text([("important", "Description:"), description]),
+                        urwid.Columns(
+                            [
+                                ("weight", 1, urwid.Text(("important", "Title"))),
+                                ("weight", 4, urwid.Text(title)),
+                            ]
+                        ),
+                        urwid.Columns(
+                            [
+                                (
+                                    "weight",
+                                    1,
+                                    urwid.Text(("important", "Description")),
+                                ),
+                                ("weight", 4, urwid.Text(description)),
+                            ],
+                        ),
+                        urwid.Columns(
+                            [
+                                ("weight", 1, urwid.Text(("important", "Severity"))),
+                                ("weight", 4, urwid.Text(severity)),
+                            ]
+                        ),
+                        urwid.Columns(
+                            [
+                                ("weight", 1, urwid.Text(("important", "Status"))),
+                                ("weight", 4, urwid.Text(status)),
+                            ]
+                        ),
+                        urwid.Columns(
+                            [
+                                ("weight", 1, urwid.Text(("important", "Assigned"))),
+                                ("weight", 4, urwid.Text(owner)),
+                            ]
+                        ),
                     ]
                 )
             ),
