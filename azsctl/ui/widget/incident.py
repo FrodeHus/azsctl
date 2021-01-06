@@ -16,6 +16,8 @@ class IncidentView(urwid.WidgetWrap):
         return super().keypress(size, key)
 
     def hide_incident(self):
+        if self.incident_detail:
+            self.incident_detail = None
         self._w = self.main_list
 
     def load_incidents(self):
@@ -28,13 +30,22 @@ class IncidentView(urwid.WidgetWrap):
     def show_incident(self, incident):
         if not incident:
             return
-        
-        self._w = urwid.Pile([self.main_list, urwid.LineBox(urwid.Filler(urwid.Text(json.dumps(incident, indent=2)), 'middle'))])
+        self.incident_detail = IncidentDetailView(incident)
+        self._w = urwid.Pile([self.main_list, self.incident_detail], focus_item=self.incident_detail)
         
 
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
         
+class IncidentDetailView(urwid.WidgetWrap):
+    def __init__(self, incident):
+        self.incident = incident
+        self._body = urwid.LineBox(urwid.Filler(urwid.Text(json.dumps(incident, indent=2)), 'middle'))
+        self._frame = urwid.Frame(self._body)
+        super().__init__(self._frame)
+    
+    def selectable(self):
+        return True
 
 class IncidentItem(urwid.WidgetWrap):
     def __init__(self, incident):
