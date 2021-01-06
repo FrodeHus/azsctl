@@ -45,7 +45,8 @@ class IncidentView(urwid.WidgetWrap):
         tabs = TabPanel(
             [
                 TabItem("Overview", incident_detail),
-                TabItem("Events", urwid.Pile([])),
+                TabItem("Entities", urwid.Pile([])),
+                TabItem("Events", IncidentEventView(incident)),
             ]
         )
         self.detail_view = urwid.Pile([self.main_list, tabs], 1)
@@ -55,6 +56,28 @@ class IncidentView(urwid.WidgetWrap):
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
 
+
+class IncidentEventView(urwid.WidgetWrap):
+    def __init__(self, incident):
+        self.api = AzureSentinelApi()
+        self.incident = incident
+        self._body = self.prepare_view()
+        super().__init__(self._body)
+
+    def load_events(self):
+        alerts = self.api.get_incident_alerts(self.incident["name"])
+        events = []
+        for alert in alerts:
+            alert_events = self.api.get_alert_events(alert["name"])
+            events = events + alert_events
+        return [
+            urwid.AttrMap(AlertEventItem(ev), None, focus_map="focus")
+            for ev in events
+        ]
+
+    def prepare_view(self):
+        event_list = SentinelItemList(self.load_events)
+        return event_list
 
 class IncidentDetailView(urwid.WidgetWrap):
     def __init__(self, incident):
@@ -145,3 +168,17 @@ class IncidentItem(urwid.WidgetWrap):
             ],
             dividechars=1,
         )
+
+
+class AlertEventItem(urwid.WidgetWrap):
+    def __init__(self, event_row):
+        self.data = event_row
+        w = self.get_event_label()
+        super().__init__(w)
+
+    def get_event_label(self):
+        fields = []
+        for col in self.data.keys():
+            value = self.data[col]
+            fields.append(urwid.Text(str(value)))
+        return urwid.Columns(fields, dividechars=1)
