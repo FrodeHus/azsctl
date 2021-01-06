@@ -5,11 +5,6 @@ from azsctl.ui.controller import Controller, RefreshableItems
 from azsctl.ui.statusbar import StatusBar
 from azsctl.ui.widget import (
     IncidentView,
-    SentinelItemList,
-    SentinelItemListWalker,
-    RefreshableItems,
-    RuleItem,
-    IncidentItem,
     TabItem,
     TabPanel,
 )

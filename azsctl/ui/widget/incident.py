@@ -13,8 +13,7 @@ class IncidentView(urwid.WidgetWrap):
     def keypress(self, size, key):
         if key in ('esc'):
             self.hide_incident()
-
-        return key
+        return super().keypress(size, key)
 
     def hide_incident(self):
         self._w = self.main_list
