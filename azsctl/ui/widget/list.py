@@ -2,6 +2,7 @@ import urwid
 from azsctl.ui.controller import RefreshableItems
 from typing import Callable,List
 
+   
 class SentinelItemList(urwid.ListBox):
     def __init__(self, item_retriever : Callable[[], List[urwid.Widget]]):
         self.walker = SentinelItemListWalker(item_retriever)
@@ -13,7 +14,7 @@ class SentinelItemList(urwid.ListBox):
             urwid.emit_signal(self, 'item_selected', self, self.walker.selected_item())
         elif key == 'r':
             self.walker.refresh()
-        return urwid.ListBox.keypress(self, size, key)
+        return super().keypress(size, key)
 
 class SentinelItemListWalker(urwid.ListWalker):
     def __init__(self, item_retriever : Callable[[], List[urwid.Widget]]):

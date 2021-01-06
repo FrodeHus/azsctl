@@ -99,6 +99,9 @@ class AzureSentinelApi(BaseApi):
 
         props_raw = alert["ExtendedProperties"]
         props = json.loads(props_raw)
+        if not "Query" in props:
+            return []
+            
         start_time = alert["StartTime"]
         end_time = alert["EndTime"]
         result = analytics.execute_query(props["Query"], timespan=f"{start_time}/{end_time}")

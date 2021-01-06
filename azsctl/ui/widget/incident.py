@@ -3,14 +3,13 @@ from azsctl.ui.widget.list import SentinelItemList
 from azsctl.api import AzureSentinelApi
 import urwid
 
-
 class IncidentView(urwid.WidgetWrap):
     def __init__(self):
         self.api = AzureSentinelApi()
         self.main_list = SentinelItemList(self.load_incidents)
         self.show_detail = False
         urwid.connect_signal(self.main_list, "item_selected", self.handle_item_selected)
-        urwid.WidgetWrap.__init__(self, self.main_list)
+        urwid.WidgetWrap.__init__(self, self.main_list)        
 
     def keypress(self, size, key):
         if key in ("esc"):
