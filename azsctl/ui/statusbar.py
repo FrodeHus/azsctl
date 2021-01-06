@@ -16,7 +16,7 @@ class ActionBar(urwid.WidgetWrap):
         self.active_prompt = False
         signals.status_message.connect(self.signal_message)
         signals.action_command.connect(self.signal_command)
-        signals.execute.connect(self.signal_execute)
+        signals.execute.connect(self.signal_execute)        
 
     def signal_command(self, sender, cmd):
         self.active_prompt = True

@@ -3,12 +3,15 @@ import urwid
 from azsctl.ui import signals
 from azsctl.ui.controller import Controller, RefreshableItems
 from azsctl.ui.statusbar import StatusBar
-from azsctl.ui.tabs import TabItem, TabPanel
-from azsctl.ui.widgets import (
+from azsctl.ui.widget import (
+    IncidentView,
     SentinelItemList,
     SentinelItemListWalker,
+    RefreshableItems,
     RuleItem,
     IncidentItem,
+    TabItem,
+    TabPanel,
 )
 
 
@@ -18,41 +21,16 @@ class Window(urwid.Frame):
         self.controller = controller
         signals.focus.connect(self.signal_focus)
 
-        def rule_retrieval_method():
-            return [
-                urwid.AttrMap(RuleItem(rule), None, focus_map="focus")
-                for rule in self.controller.get_alert_rules()
-            ]
-
-        def incident_retrieval_method():
-            return [
-                urwid.AttrMap(IncidentItem(incident), None, focus_map="focus")
-                for incident in self.controller.get_incidents()
-            ]
-
+        incident_view = IncidentView()
         tabs = [
             TabItem(
                 "Incident",
                 urwid.AttrWrap(
-                    SentinelItemList(
-                        SentinelItemListWalker(
-                            RefreshableItems(incident_retrieval_method, [])
-                        )
-                    ),
+                    incident_view,
                     "background",
                 ),
             ),
-            TabItem(
-                "Alert rule",
-                urwid.AttrWrap(
-                    SentinelItemList(
-                        SentinelItemListWalker(
-                            RefreshableItems(rule_retrieval_method, [])
-                        )
-                    ),
-                    "background",
-                ),
-            ),
+            TabItem("Alert rule", urwid.Pile([])),
             TabItem("Hunting", urwid.Pile([])),
             TabItem("Threat indicators", urwid.Pile([])),
             TabItem("Analytics", urwid.Pile([])),
