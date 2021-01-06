@@ -105,9 +105,13 @@ class CommandLoader(CLICommandsLoader):
             g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
             g.command("import", "import_rule", confirmation=True)
+        with CommandGroup(self, "rule template", "azsctl.commands.rule#{}") as g:
+            g.command("list", "list_alert_rule_templates")
         with CommandGroup(self, "alert", "azsctl.commands.alert#{}") as g:
             g.command("show", "get_alert")
             g.command("events", "get_alert_events")
+        with CommandGroup(self, "dataconnector", "azsctl.commands.dataconnector#{}") as g:
+            g.command("list", "list_data_connectors")
         with CommandGroup(self, "analytics", "azsctl.commands.analytics#{}") as g:
             g.command("query", "execute_query")
         with CommandGroup(self, "analytics datasource", "azsctl.commands.analytics#{}") as g:
@@ -120,6 +124,8 @@ class CommandLoader(CLICommandsLoader):
     def load_arguments(self, command):
         with ArgumentsContext(self, 'rule import') as ac:
             ac.argument('validate-only', type=bool)
+        with ArgumentsContext(self, 'incident list') as ac:
+            ac.argument('only-assigned', type=bool)
         super(CommandLoader, self).load_arguments(command)
 
 

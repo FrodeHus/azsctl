@@ -1,3 +1,4 @@
+from azsctl.classes import AlertRuleKind
 from azsctl import current_config
 import requests
 import sys
@@ -62,11 +63,11 @@ class AzureSentinelApi(BaseApi):
         _, workspace_id = current_config.get_workspace()
         self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"
 
-    def get_incidents(self):
+    def get_incidents(self, filter : str):
         """
         Gets all Azure Sentinel incidents
         """
-        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01&$orderby=properties/createdTimeUtc desc&$filter=properties/status ne 'Closed'"
+        endpoint = f"{self._endpoint}incidents?api-version=2020-01-01&$orderby=properties/createdTimeUtc desc&$filter={filter}"
         incidents = self.get(endpoint)
         return incidents["value"]
 
@@ -78,7 +79,9 @@ class AzureSentinelApi(BaseApi):
     def get_incident_alerts(self, incident_id : str):
         endpoint = f"{self._endpoint}/incidents/{incident_id}/alerts?api-version=2019-01-01-preview"
         alerts = self.post(endpoint, payload=None)
-        return alerts["value"]
+        if "value" in alerts:
+            return alerts["value"]
+        return []
 
     def get_alert(self, alert_id : str):
         analytics = AzureLogAnalytics()
@@ -121,6 +124,16 @@ class AzureSentinelApi(BaseApi):
         endpoint = f"{self._endpoint}/alertRules/{rule_id}?api-version=2020-01-01"
         result = self.put(endpoint, rule)
         return result
+
+    def list_alert_rule_templates(self):
+        endpoint = f"{self._endpoint}/alertRuleTemplates?api-version=2020-01-01"
+        result = self.get(endpoint)
+        return result["value"]
+
+    def list_data_connectors(self):
+        endpoint = f"{self._endpoint}/dataConnectors?api-version=2020-01-01"
+        result = self.get(endpoint)
+        return result["value"]
 
 class AzureManagementApi(BaseApi):
     def __init__(self):

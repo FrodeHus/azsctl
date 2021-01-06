@@ -37,6 +37,16 @@ class TokenRequester:
         if "access_token" in result:
             return result["access_token"]
 
+    def get_current_user(self):
+        """
+        Retrieves currently logged on username and id
+        :returns: tuple of username and id
+        """
+        accounts = self._app.get_accounts()
+        if accounts:
+            chosen = accounts[0]
+            return chosen["username"], chosen["local_account_id"]
+        
     def _acquire_token_interactively(self):
         flow = self._app.initiate_device_flow(scopes=self._scope)
         print(flow["message"])
