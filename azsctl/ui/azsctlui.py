@@ -12,6 +12,7 @@ class AzsctlUI:
             ("heading", "white", "dark blue"),
             ("heading inactive", "light gray", "light blue"),
             ("focus", "light magenta", "light gray"),
+            ("actionbar:action", "white", "black"),
             ("important", 'dark blue','black',('standout','underline'))
         ]
         self.controller = controller

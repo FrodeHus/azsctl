@@ -1,5 +1,3 @@
-from typing import Text
-from urwid.container import Columns
 from azsctl.ui.widget.tabs import TabPanel, TabItem
 from azsctl.ui.widget.list import SentinelItemList
 from azsctl.api import AzureSentinelApi
@@ -28,7 +26,8 @@ class IncidentView(urwid.WidgetWrap):
 
     def hide_incident(self):
         self.show_detail = False
-        del self.detail_view
+        if self.detail_view:
+            del self.detail_view
         self._w = self.main_list
 
     def load_incidents(self):

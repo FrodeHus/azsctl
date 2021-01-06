@@ -52,9 +52,10 @@ class ActionBar(urwid.WidgetWrap):
 class StatusBar(urwid.WidgetWrap):
     REFRESH_TIME = 0.5 
 
-    def __init__(self):
+    def __init__(self, actions = []):
         self.infobar = urwid.WidgetWrap(urwid.Text(""))
         self.actionbar = ActionBar()
+        self.build_action_widgets(actions)
         self.current_user, _ = TokenRequester().get_current_user()
         super().__init__(urwid.Pile([self.infobar, self.actionbar]))
         self.refresh()
@@ -66,7 +67,17 @@ class StatusBar(urwid.WidgetWrap):
     def redraw(self):
         workspace,_ = current_config.get_workspace()
         status = urwid.AttrWrap(urwid.Columns([
-            urwid.Text(self.current_user),
+            self.actions,
             urwid.Text(workspace, align="right"),
         ]), "heading")
         self.infobar._w = status
+
+    def build_action_widgets(self, actions):
+        action_widgets = []
+        for action in actions:
+            w = urwid.Text([('important',action[0])," ", action[1]])
+            w = urwid.Padding(w, align="center")
+            w = urwid.AttrMap(w, 'actionbar:action')
+            action_widgets.append(w)
+        
+        self.actions = urwid.Columns(action_widgets, dividechars=1)

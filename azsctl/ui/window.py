@@ -12,29 +12,31 @@ from azsctl.ui.widget import (
 
 class Window(urwid.Frame):
     def __init__(self, controller: Controller):
-        self.statusbar = StatusBar()
+        self.statusbar = StatusBar([
+            ('F1', 'Incidents'),
+            ('F2', 'Alert rules'),
+            ('F3', 'Hunting'),
+            ('F4', 'Threat indicators'),
+            ('F5', 'Analytics'),
+        ])
         self.controller = controller
         signals.focus.connect(self.signal_focus)
-
-        incident_view = IncidentView()
-        tabs = [
-            TabItem(
-                "Incident",
-                urwid.AttrWrap(
-                    incident_view,
-                    "background",
-                ),
-            ),
-            TabItem("Alert rule", urwid.Pile([])),
-            TabItem("Hunting", urwid.Pile([])),
-            TabItem("Threat indicators", urwid.Pile([])),
-            TabItem("Analytics", urwid.Pile([])),
+        self.windows = [
+            IncidentView(),
+            urwid.Pile([])
         ]
-
         super().__init__(
-            TabPanel(tabs),
+            self.windows[0],
             footer=urwid.AttrWrap(self.statusbar, "background"),
         )
+
+    def keypress(self, size, key):
+        if key == "f1":
+            self.body = self.windows[0]
+        if key == "f2":
+            self.body = self.windows[1]
+        
+        return super().keypress(size, key)
 
     def signal_focus(self, sender, section):
         self.focus_position = section
