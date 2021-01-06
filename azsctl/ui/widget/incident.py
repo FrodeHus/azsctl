@@ -1,3 +1,4 @@
+import json
 from azsctl.ui.widget.list import SentinelItemList
 from azsctl.api import AzureSentinelApi
 import urwid
@@ -16,8 +17,14 @@ class IncidentView(urwid.WidgetWrap):
                 for incident in incidents
             ]
 
+    def show_incident(self, incident):
+        if not incident:
+            return
+        
+        self._w = urwid.Pile([self.main_list, urwid.Text(json.dumps(incident, indent=2))])
+
     def handle_item_selected(self, sender, item):
-        print(item)
+        self.show_incident(item)
         
 
 class IncidentItem(urwid.WidgetWrap):
@@ -28,7 +35,7 @@ class IncidentItem(urwid.WidgetWrap):
 
     def get_data(self):
         return self.data
-        
+
     def selectable(self):
         return True
 
