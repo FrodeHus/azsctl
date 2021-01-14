@@ -16,13 +16,3 @@ class Controller:
         return incidents
 
 
-class RefreshableItems:
-    def __init__(self, method, method_args):
-        self.retrieve = method
-        self.method_args = method_args
-        result = self.retrieve(*self.method_args)
-        self.items = result
-
-    def refresh(self):
-        result = self.retrieve(*self.method_args)
-        self.items = result

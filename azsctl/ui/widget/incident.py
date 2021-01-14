@@ -1,6 +1,9 @@
 from azsctl.ui.widget.tabs import TabPanel, TabItem
 from azsctl.ui.widget.list import SentinelItemList
+from azsctl.ui.widget.table import AnalyticsResultTable
 from azsctl.api import AzureSentinelApi
+from dateutil.parser import parse
+import asyncio
 import urwid
 
 class IncidentView(urwid.WidgetWrap):
@@ -56,7 +59,7 @@ class IncidentView(urwid.WidgetWrap):
         self.show_incident(item)
 
 
-class IncidentEventView(urwid.WidgetWrap):
+class IncidentEventView(urwid.Frame):
     def __init__(self, incident):
         self.api = AzureSentinelApi()
         self.incident = incident
@@ -69,26 +72,22 @@ class IncidentEventView(urwid.WidgetWrap):
 
     def keypress(self, size, key):
         if key == "r" and self.is_first_view:
-            self._w = urwid.Filler(urwid.Text("Please wait...", align="center"), "middle")
-            self._body = self.prepare_view()
-            self._w = self._body
+            self.body = self.prepare_view()
             self.is_first_view = False
-        
-        return key
+        super().keypress(size, key)
 
     def load_events(self):
         alerts = self.api.get_incident_alerts(self.incident["name"])
         events = []
         for alert in alerts:
             alert_events = self.api.get_alert_events(alert["name"])
-            events = events + alert_events
-        return [
-            urwid.AttrMap(AlertEventItem(ev), None, focus_map="focus")
-            for ev in events
-        ]
+            if isinstance(alert_events, list):
+                events = events + alert_events
+        return events
 
     def prepare_view(self):
-        event_list = SentinelItemList(self.load_events)
+        data = self.load_events()
+        event_list = AnalyticsResultTable(data)
         return event_list
 
 class IncidentDetailView(urwid.WidgetWrap):
@@ -167,12 +166,20 @@ class IncidentItem(urwid.WidgetWrap):
     def selectable(self):
         return True
 
+    def format_timestamp(self, s):
+        d = parse(s)        
+        return d.strftime("%Y-%m-%d %H:%M:%S")        
+
     def get_rule_text(self):
         owner = self.data["properties"]["owner"]["userPrincipalName"]
         if not owner:
             owner = "Unassigned"
+        date = self.data["properties"]["createdTimeUtc"]
+        if date:
+            date = self.format_timestamp(date)
         return urwid.Columns(
             [
+                ("weight", 1, urwid.Text(date)),
                 ("weight", 4, urwid.Text(self.data["properties"]["title"])),
                 ("weight", 1, urwid.Text(self.data["properties"]["severity"])),
                 ("weight", 1, urwid.Text(self.data["properties"]["status"])),

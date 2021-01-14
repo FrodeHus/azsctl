@@ -1,7 +1,7 @@
 import asyncio
 import urwid
 from azsctl.ui import signals
-from azsctl.ui.controller import Controller, RefreshableItems
+from azsctl.ui.controller import Controller
 from azsctl.ui.statusbar import StatusBar
 from azsctl.ui.widget import (
     IncidentView,

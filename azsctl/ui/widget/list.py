@@ -1,5 +1,4 @@
 import urwid
-from azsctl.ui.controller import RefreshableItems
 from typing import Callable,List
 
    
