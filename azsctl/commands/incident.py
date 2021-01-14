@@ -3,7 +3,10 @@ from azsctl import current_config
 from azsctl.api import AzureSentinelApi
 from azsctl.auth import TokenRequester
 
-def list_incidents(only_assigned : bool = False, filter : str = "properties/status ne 'Closed'"):
+
+def list_incidents(
+    only_assigned: bool = False, filter: str = "properties/status ne 'Closed'"
+):
     """
     Retrieves a list of incidents (default: non-closed)
     """
@@ -13,10 +16,11 @@ def list_incidents(only_assigned : bool = False, filter : str = "properties/stat
         sys.exit(1)
     api = AzureSentinelApi()
     if only_assigned:
-        _, user_id = TokenRequester().get_current_user()        
+        _, user_id = TokenRequester().get_current_user()
         filter = f"{filter} and properties/owner/objectId eq '{user_id}'"
 
     return api.get_incidents(filter)
+
 
 def get_incident(id: str):
     """
@@ -25,14 +29,16 @@ def get_incident(id: str):
     api = AzureSentinelApi()
     return api.get_incident(id)
 
-def get_incident_alerts(id : str):
+
+def get_incident_alerts(id: str):
     """
     Retrieves the alerts connected to the specified incident
     """
     api = AzureSentinelApi()
     return api.get_incident_alerts(id)
 
-def get_incident_events(id : str):
+
+def get_incident_events(id: str):
     """
     Retrieves the events of all alerts connected to specified incident
     """
@@ -42,5 +48,20 @@ def get_incident_events(id : str):
     for alert in alerts:
         alert_events = api.get_alert_events(alert["name"])
         events = events + alert_events
-    
+
     return events
+
+
+def get_incident_entities(id: str):
+    """
+    Retrieves the entities involved in specified incident
+    """
+    api = AzureSentinelApi()
+    entities = api.get_incident_entities(id)
+    items = []
+    for entity in entities:
+        item = {}
+        item["kind"] = entity["kind"]
+        item.update(entity["properties"])
+        items.append(item)
+    return items

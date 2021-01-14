@@ -83,6 +83,13 @@ class AzureSentinelApi(BaseApi):
             return alerts["value"]
         return []
 
+    def get_incident_entities(self, incident_id : str):
+        endpoint = f"{self._endpoint}/incidents/{incident_id}/entities?api-version=2019-01-01-preview"
+        entities = self.post(endpoint, payload=None)
+        if "entities" in entities:
+            return entities["entities"]
+        return []
+        
     def get_alert(self, alert_id : str):
         analytics = AzureLogAnalytics()
         result = analytics.execute_query(f"SecurityAlert | where SystemAlertId == \"{alert_id}\"")

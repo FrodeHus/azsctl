@@ -17,9 +17,15 @@ class TableCell(urwid.Text):
 
         if len(content) > max_length:
             content = content[0:max_length - 1]
+            content += chr(187)
+
+        if self._align == 'left':
+            content = content.ljust(max_length)
+        else:
+            content = content.rjust(max_length)
 
         if self.separator:
-            content = content + "|"
+            content += chr(124)
 
         return content
 
