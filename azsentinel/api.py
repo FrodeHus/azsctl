@@ -1,5 +1,5 @@
-from azsctl.classes import AlertRuleKind
-from azsctl import current_config
+from azsentinel.classes import AlertRuleKind
+from azsentinel import current_config
 import requests
 import sys
 import json

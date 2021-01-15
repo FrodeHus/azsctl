@@ -1,7 +1,7 @@
 import sys
 from azsctl import current_config
-from azsctl.api import AzureSentinelApi
-from azsctl.auth import TokenRequester
+from azsentinel.api import AzureSentinelApi
+from azsentinel.auth import TokenRequester
 
 
 def list_incidents(

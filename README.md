@@ -12,7 +12,7 @@ Tried to make it as simple as possible so... try:
 
 ### Enable tab completion
 
-`source azsctl.completion.sh`
+`source azsentinel.completion.sh`
 
 ## Usage
 

@@ -1,8 +1,8 @@
-from azsctl.classes import ScheduledAlertRuleTemplate
+from azsentinel.classes import ScheduledAlertRuleTemplate
 import unittest
 from unittest import mock
 import yaml
-from azsctl.validators import ScheduledRuleValidator
+from azsentinel.validators import ScheduledRuleValidator
 
 test_rule = """
 id: e1ce0eab-10d1-4aae-863f-9a383345ba88

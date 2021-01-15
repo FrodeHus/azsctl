@@ -1,9 +1,9 @@
 import json
 import yaml
-from azsctl.api import AzureSentinelApi
-from azsctl.classes import ScheduledAlertRule, ScheduledAlertRuleTemplate
-from azsctl.commands.analytics import execute_query
-from azsctl.validators import ScheduledRuleValidator
+from azsentinel.api import AzureSentinelApi
+from azsentinel.classes import ScheduledAlertRule, ScheduledAlertRuleTemplate
+from azsentinel.commands.analytics import execute_query
+from azsentinel.validators import ScheduledRuleValidator
 from PyInquirer.prompt import prompt
 
 

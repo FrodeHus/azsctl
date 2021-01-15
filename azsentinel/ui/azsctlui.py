@@ -1,5 +1,5 @@
-from azsctl.ui.window import Window
-from azsctl.ui import signals
+from azsentinel.ui.window import Window
+from azsentinel.ui import signals
 from .controller import Controller
 import urwid
 class AzsctlUI:

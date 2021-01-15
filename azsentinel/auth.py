@@ -1,6 +1,6 @@
 import msal
 import sys, os, atexit
-from azsctl import current_config
+from azsentinel import current_config
 
 class TokenRequester:
     def __init__(self):

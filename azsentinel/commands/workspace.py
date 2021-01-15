@@ -1,4 +1,4 @@
-from azsctl.api import AzureManagementApi
+from azsentinel.api import AzureManagementApi
 def show_workspace():
     api = AzureManagementApi()
     return api.get_current_workspace()

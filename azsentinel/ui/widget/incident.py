@@ -1,8 +1,8 @@
 import json
-from azsctl.ui.widget.tabs import TabPanel, TabItem
-from azsctl.ui.widget.list import SentinelItemList
-from azsctl.ui.widget.table import Table
-from azsctl.api import AzureSentinelApi
+from azsentinel.ui.widget.tabs import TabPanel, TabItem
+from azsentinel.ui.widget.list import SentinelItemList
+from azsentinel.ui.widget.table import Table
+from azsentinel.api import AzureSentinelApi
 from dateutil.parser import parse
 import asyncio
 import urwid

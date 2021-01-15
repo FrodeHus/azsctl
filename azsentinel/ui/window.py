@@ -1,9 +1,9 @@
 import asyncio
 import urwid
-from azsctl.ui import signals
-from azsctl.ui.controller import Controller
-from azsctl.ui.statusbar import StatusBar
-from azsctl.ui.widget import (
+from azsentinel.ui import signals
+from azsentinel.ui.controller import Controller
+from azsentinel.ui.statusbar import StatusBar
+from azsentinel.ui.widget import (
     IncidentView,
     TabItem,
     TabPanel,

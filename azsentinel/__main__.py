@@ -1,16 +1,16 @@
 import json
 import os,sys
 from textwrap import indent
-from azsctl.api import AzureManagementApi, AzureSentinelApi
+from azsentinel.api import AzureManagementApi, AzureSentinelApi
 from PyInquirer import prompt
-from azsctl import current_config
+from azsentinel import current_config
 from knack import CLI, experimental
 from knack.commands import CLICommandsLoader, CommandGroup
 from knack.arguments import ArgumentsContext, CLIArgumentType
 from knack.help import CLIHelp
 from knack.help_files import helps
-from azsctl.ui import AzsctlUI
-from azsctl.ui.controller import Controller
+from azsentinel.ui import AzsctlUI
+from azsentinel.ui.controller import Controller
 
 
 def login():
@@ -90,34 +90,34 @@ short-summary: View information about the workspace(s) you have access to
 
 class CommandLoader(CLICommandsLoader):
     def load_command_table(self, args):
-        with CommandGroup(self, "", "azsctl.__main__#{}") as g:
+        with CommandGroup(self, "", "azsentinel.__main__#{}") as g:
             g.command("login", "login")
             g.command("select-workspace", "select_workspace")
             g.command("ui", "show_ui", is_experimental=True)
-        with CommandGroup(self, "incident", "azsctl.commands.incident#{}") as g:
+        with CommandGroup(self, "incident", "azsentinel.commands.incident#{}") as g:
             g.command("list", "list_incidents")
             g.command("alerts", "get_incident_alerts")
             g.command("alert-events", "get_incident_events")
             g.command("entities", "get_incident_entities")
             g.command("show", "get_incident")
-        with CommandGroup(self, "rule", "azsctl.commands.rule#{}") as g:
+        with CommandGroup(self, "rule", "azsentinel.commands.rule#{}") as g:
             g.command("list", "list_rules")
             g.command("show", "get_rule")
             g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
             g.command("import", "import_rule", confirmation=True)
-        with CommandGroup(self, "rule template", "azsctl.commands.rule#{}") as g:
+        with CommandGroup(self, "rule template", "azsentinel.commands.rule#{}") as g:
             g.command("list", "list_alert_rule_templates")
-        with CommandGroup(self, "alert", "azsctl.commands.alert#{}") as g:
+        with CommandGroup(self, "alert", "azsentinel.commands.alert#{}") as g:
             g.command("show", "get_alert")
             g.command("events", "get_alert_events")
-        with CommandGroup(self, "dataconnector", "azsctl.commands.dataconnector#{}") as g:
+        with CommandGroup(self, "dataconnector", "azsentinel.commands.dataconnector#{}") as g:
             g.command("list", "list_data_connectors")
-        with CommandGroup(self, "analytics", "azsctl.commands.analytics#{}") as g:
+        with CommandGroup(self, "analytics", "azsentinel.commands.analytics#{}") as g:
             g.command("query", "execute_query")
-        with CommandGroup(self, "analytics datasource", "azsctl.commands.analytics#{}") as g:
+        with CommandGroup(self, "analytics datasource", "azsentinel.commands.analytics#{}") as g:
             g.command("list", "list_datasources")
-        with CommandGroup(self, "workspace", "azsctl.commands.workspace#{}") as g:
+        with CommandGroup(self, "workspace", "azsentinel.commands.workspace#{}") as g:
             g.command("show", "show_workspace")
             g.command("list", "list_workspaces")
         return super(CommandLoader, self).load_command_table(args)

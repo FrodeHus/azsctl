@@ -1,4 +1,4 @@
-from azsctl.api import AzureSentinelApi, AzureLogAnalytics, AzureManagementApi
+from azsentinel.api import AzureSentinelApi, AzureLogAnalytics, AzureManagementApi
 import asyncio
 class Controller:
     def __init__(self):
