@@ -3,8 +3,8 @@ from azsentinel.ui.widget.tabs import TabPanel, TabItem
 from azsentinel.ui.widget.list import SentinelItemList
 from azsentinel.ui.widget.table import Table
 from azsentinel.api import AzureSentinelApi
+from azsentinel.ui.widget.dialog import Dialog
 from dateutil.parser import parse
-import asyncio
 import urwid
 
 class IncidentView(urwid.WidgetWrap):
@@ -84,7 +84,7 @@ class IncidentEventView(urwid.Frame):
         self.incident = incident
         self._body = urwid.Filler(urwid.Text(["Press '",("important", "r"), "' to load events (could take a while)"], align="center"), 'middle')
         self.is_first_view = True
-        super().__init__(self._body)    
+        super().__init__(self._body)
 
     def selectable(self):
         return True
@@ -97,8 +97,12 @@ class IncidentEventView(urwid.Frame):
         super().keypress(size, key)
 
     def handle_item_selected(self, sender, item):
-        # handle the selected table row
-        pass
+        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Text(json.dumps(item, indent=2))])))
+        view = Dialog(view, self._body)
+        self._original_body = self._body
+        urwid.connect_signal(view, Dialog.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        self.set_body(view)
+        
 
     def load_events(self):
         alerts = self.api.get_incident_alerts(self.incident["name"])

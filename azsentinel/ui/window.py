@@ -1,4 +1,5 @@
 import asyncio
+from azsentinel.ui.widget.dialog import Dialog
 import urwid
 from azsentinel.ui import signals
 from azsentinel.ui.controller import Controller
@@ -42,8 +43,8 @@ class Window(urwid.Frame):
             self.body = self.windows[0]
         if key == "f2":
             self.body = self.windows[1]
-        
         return super().keypress(size, key)
+
 
     def signal_focus(self, sender, section):
         self.focus_position = section

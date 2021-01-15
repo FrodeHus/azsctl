@@ -50,14 +50,6 @@ class TableRow(urwid.Columns):
             columns.append(TableCell(str(value)))
         return columns
 
-    # def render(self, size, focus=False):
-    #     for field in self.contents:
-    #         if not isinstance(field[0], TableCell):
-    #             continue
-
-    #         text, attr = field[0].get_text()
-    #     return super().render(size, focus=focus)
-
 class TableHeader(TableRow):
     def __init__(self, headers):
         super().__init__(headers, False)
@@ -88,11 +80,11 @@ class Table(urwid.Frame):
     def __init__(self,result):
         self._result = result
         self._rows = len(self._result)
-        headers = []
+        self.headers = []
         if self._rows > 0:
             item = self._result[0]
-            headers = item.keys()
-        self._header = TableHeader(headers)
+            self.headers = item.keys()
+        self._header = TableHeader(self.headers)
         self._body = TableView()
         self._build_rows(self._result)
         urwid.register_signal(self.__class__, ['keypress','item_selected'])
@@ -104,6 +96,8 @@ class Table(urwid.Frame):
 
     def keypress(self, size, key):
         if key == 'enter':
-            urwid.emit_signal(self, 'item_selected', self, self.focus.focused_row.data)
+            values = self.focus.focused_row.data
+            item = zip(self.headers, values)
+            urwid.emit_signal(self, 'item_selected', self, dict(item))
         urwid.emit_signal(self, 'keypress', self, key)
         return super().keypress(size, key)
