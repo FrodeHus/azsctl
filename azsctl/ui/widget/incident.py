@@ -1,6 +1,7 @@
+import json
 from azsctl.ui.widget.tabs import TabPanel, TabItem
 from azsctl.ui.widget.list import SentinelItemList
-from azsctl.ui.widget.table import AnalyticsResultTable
+from azsctl.ui.widget.table import Table
 from azsctl.api import AzureSentinelApi
 from dateutil.parser import parse
 import asyncio
@@ -28,7 +29,7 @@ class IncidentView(urwid.WidgetWrap):
 
     def hide_incident(self):
         self.show_detail = False
-        if self.detail_view:
+        if hasattr(self, 'detail_view'):
             del self.detail_view
         self._w = self.main_list
 
@@ -44,10 +45,11 @@ class IncidentView(urwid.WidgetWrap):
             return
         self.show_detail = True
         incident_detail = IncidentDetailView(incident)
+        entities = self._get_incident_entities(incident["name"])
         tabs = TabPanel(
             [
                 TabItem("Overview", incident_detail),
-                TabItem("Entities", urwid.Pile([])),
+                TabItem("Entities", Table(entities)),
                 TabItem("Events", IncidentEventView(incident)),
             ]
         )
@@ -58,6 +60,23 @@ class IncidentView(urwid.WidgetWrap):
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
 
+    def _get_incident_entities(self, incident_id):
+        entities = self.api.get_incident_entities(incident_id)
+        items = []
+        for entity in entities:
+            item = {}
+            item["kind"] = entity["kind"]
+            if item["kind"] == "Ip":
+                item["name"] = entity["properties"]["address"]
+            elif item["kind"] == "Host":
+                item["name"] = entity["properties"]["hostName"]
+            elif item["kind"] == "Account":
+                item["name"] = entity["properties"]["accountName"]
+            elif item["kind"] == "Url":
+                item["name"] = entity["properties"]["url"]
+            items.append(item)
+        return items
+
 
 class IncidentEventView(urwid.Frame):
     def __init__(self, incident):
@@ -65,7 +84,7 @@ class IncidentEventView(urwid.Frame):
         self.incident = incident
         self._body = urwid.Filler(urwid.Text(["Press '",("important", "r"), "' to load events (could take a while)"], align="center"), 'middle')
         self.is_first_view = True
-        super().__init__(self._body)
+        super().__init__(self._body)    
 
     def selectable(self):
         return True
@@ -73,8 +92,13 @@ class IncidentEventView(urwid.Frame):
     def keypress(self, size, key):
         if key == "r" and self.is_first_view:
             self.body = self.prepare_view()
+            urwid.connect_signal(self.body, 'item_selected', self.handle_item_selected)
             self.is_first_view = False
         super().keypress(size, key)
+
+    def handle_item_selected(self, sender, item):
+        # handle the selected table row
+        pass
 
     def load_events(self):
         alerts = self.api.get_incident_alerts(self.incident["name"])
@@ -87,7 +111,7 @@ class IncidentEventView(urwid.Frame):
 
     def prepare_view(self):
         data = self.load_events()
-        event_list = AnalyticsResultTable(data)
+        event_list = Table(data)
         return event_list
 
 class IncidentDetailView(urwid.WidgetWrap):

@@ -7,7 +7,7 @@ class TableCell(urwid.Text):
         self._align = align
         self._width = width
         self._content = self._render_content()
-        super().__init__(self._content, align, 'ellipsis')
+        super().__init__(self._content, align, 'clip')
 
     def _render_content(self):
         content = str(self._content)
@@ -35,14 +35,20 @@ class TableCell(urwid.Text):
         self.set_text(content)
 
 class TableRow(urwid.Columns):
-    def __init__(self, fields):
-        super().__init__(fields, dividechars=1)
+    def __init__(self, data, selectable = True):
+        self.data = data
+        self._selectable = selectable
+        columns = self._create_columns(data)
+        super().__init__(columns, dividechars=1)
 
     def selectable(self):
         return True
 
-    def keypress(self, size, key):
-        return key
+    def _create_columns(self, data):
+        columns = []
+        for value in data:
+            columns.append(TableCell(str(value)))
+        return columns
 
     # def render(self, size, focus=False):
     #     for field in self.contents:
@@ -54,12 +60,7 @@ class TableRow(urwid.Columns):
 
 class TableHeader(TableRow):
     def __init__(self, headers):
-        columns = self._create_columns(headers)
-        super().__init__(columns)
-
-    def _create_columns(self, headers):
-        return [TableCell(text) for text in headers]
-
+        super().__init__(headers, False)
 
 class TableView(urwid.ListBox):
     def __init__(self, rows=[]):
@@ -69,20 +70,21 @@ class TableView(urwid.ListBox):
         for row in self.body:
             yield row
 
+    def keypress(self, size, key):
+        if key in ('up', 'down'):
+            super().keypress(size, key)
+        return key
+
     @property
     def focused_row(self):
         row, index = self.body.get_focus()
         return row.original_widget
 
     def add_row(self, data):
-        columns = []
-        for value in data.values():
-            columns.append(TableCell(str(value)))
-
-        row = urwid.AttrMap(TableRow(columns), None, focus_map='heading')
+        row = urwid.AttrMap(TableRow(data.values()), None, focus_map='heading inactive')
         self.body.append(row)
 
-class AnalyticsResultTable(urwid.Frame):
+class Table(urwid.Frame):
     def __init__(self,result):
         self._result = result
         self._rows = len(self._result)
@@ -93,8 +95,15 @@ class AnalyticsResultTable(urwid.Frame):
         self._header = TableHeader(headers)
         self._body = TableView()
         self._build_rows(self._result)
-        super().__init__(self._body, header=urwid.AttrMap(self._header, 'heading'))
+        urwid.register_signal(self.__class__, ['keypress','item_selected'])
+        super().__init__(self._body, header=urwid.AttrMap(self._header, 'heading'), focus_part='body')
 
     def _build_rows(self, data):
         for item in data:
             self._body.add_row(item)
+
+    def keypress(self, size, key):
+        if key == 'enter':
+            urwid.emit_signal(self, 'item_selected', self, self.focus.focused_row.data)
+        urwid.emit_signal(self, 'keypress', self, key)
+        return super().keypress(size, key)
