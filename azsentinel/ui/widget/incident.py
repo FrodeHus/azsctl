@@ -91,10 +91,30 @@ class IncidentEventView(urwid.Frame):
 
     def keypress(self, size, key):
         if key == "r" and self.is_first_view:
+            self.set_body(urwid.Filler(urwid.Text("Running query...", align="center"), "middle"))
             self.body = self.prepare_view()
             urwid.connect_signal(self.body, 'item_selected', self.handle_item_selected)
-            self.is_first_view = False
-        super().keypress(size, key)
+            self.is_first_view = False   
+        if key == "Q":
+            self.edit_and_run_query()     
+        else:
+            super().keypress(size, key)
+
+    def edit_and_run_query(self):
+        alert_rule_id = self.incident["properties"]["relatedAnalyticRuleIds"][0]
+        if not alert_rule_id:
+            return
+        alert_rule = self.api.get(f"{alert_rule_id}?api-version=2020-01-01")
+        if not alert_rule:
+            return
+        query = alert_rule["properties"]["query"]
+        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Edit(query)])))
+        view = Dialog(view, self._body)
+        self._original_body = self._body
+        urwid.connect_signal(view, Dialog.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        self.set_body(view)
+
+
 
     def handle_item_selected(self, sender, item):
         view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Text(json.dumps(item, indent=2))])))

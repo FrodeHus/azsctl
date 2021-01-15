@@ -1,5 +1,5 @@
 import sys
-from azsctl import current_config
+from azsentinel import current_config
 from azsentinel.api import AzureSentinelApi
 from azsentinel.auth import TokenRequester
 
