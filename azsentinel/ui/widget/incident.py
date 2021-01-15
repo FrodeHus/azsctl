@@ -108,7 +108,7 @@ class IncidentEventView(urwid.Frame):
         if not alert_rule:
             return
         query = alert_rule["properties"]["query"]
-        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Edit(query)])))
+        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Edit(edit_text=query, multiline=True)])),title="Edit rule query")
         view = Dialog(view, self._body)
         self._original_body = self._body
         urwid.connect_signal(view, Dialog.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
