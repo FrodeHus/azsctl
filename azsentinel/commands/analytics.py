@@ -1,4 +1,4 @@
-from azsctl.api import AzureLogAnalytics
+from azsentinel.api import AzureLogAnalytics
 
 def execute_query(kql : str):
     api = AzureLogAnalytics()

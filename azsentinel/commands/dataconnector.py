@@ -1,4 +1,4 @@
-from azsctl.api import AzureSentinelApi
+from azsentinel.api import AzureSentinelApi
 
 def list_data_connectors():
     api = AzureSentinelApi()

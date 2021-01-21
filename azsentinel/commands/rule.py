@@ -1,10 +1,62 @@
 import json
 import yaml
-from azsctl.api import AzureSentinelApi
-from azsctl.classes import ScheduledAlertRule, ScheduledAlertRuleTemplate
-from azsctl.commands.analytics import execute_query
-from azsctl.validators import ScheduledRuleValidator
+from azsentinel.api import AzureSentinelApi
+from azsentinel.classes import ScheduledAlertRule, ScheduledAlertRuleTemplate
+from azsentinel.commands.analytics import execute_query
+from azsentinel.validators import ScheduledRuleValidator
 from PyInquirer.prompt import prompt
+import os
+
+
+def backup_rules(folder: str = None):
+    """
+    Retrieves all alert rules and saves them as individual files
+    """
+    rules = list_rules()
+    for rule in rules:
+        name = rule["properties"]["displayName"]
+        del rule["properties"]["lastModifiedUtc"]
+        filename = "".join(x for x in name.title() if not x.isspace())
+        if not folder:
+            folder = os.getcwd()
+        elif not os.path.exists(folder):
+            os.makedirs(folder)
+
+        filename = os.path.join(folder, f"{filename}.json")
+        with open(filename, "w") as rule_file:
+            json.dump(rule, rule_file, indent=2)
+
+
+def restore_rules(rule_file: str = None, folder: str = None):
+    """
+    Restore single rule from file or all rules found in specified folder.
+    This will overwrite existing rules even if newer.
+    """
+    rules = []
+    if folder:
+        for file in os.listdir(folder):
+            full_path = os.path.join(folder, file)
+            rules.append(full_path)
+    elif rule_file:
+        rules.append(rule_file)
+
+    api = AzureSentinelApi()
+    for file in rules:
+        with open(file, "r") as rule_file:
+            rule = json.load(rule_file)
+        rule_id = rule["name"]
+        existing = get_rule(rule_id)
+        name = rule["properties"]["displayName"]
+        if existing:
+            etag = existing["etag"]
+            rule["etag"] = etag
+            result = api.update_alert_rule(rule_id, rule)
+            if "status_code" in result:
+                code = result["content"]["error"]["code"]
+                message = result["content"]["error"]["message"]
+                print(f"Failed to restore rule {name} - {code} : {message}")
+                continue
+            print("Restored " + rule["properties"]["displayName"])
 
 
 def list_rules():
@@ -100,6 +152,7 @@ def select_rule():
         list(filter(lambda x: x["properties"]["displayName"] == answer["rule"], rules))
     )[0]
     return rule_id["name"]
+
 
 def list_alert_rule_templates():
     api = AzureSentinelApi()

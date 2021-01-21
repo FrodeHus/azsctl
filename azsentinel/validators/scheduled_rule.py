@@ -1,5 +1,5 @@
 import regex
-from azsctl.classes import ScheduledAlertRuleTemplate
+from azsentinel.classes import ScheduledAlertRuleTemplate
 class ScheduledRuleValidator:
     def __init__(self, rule : ScheduledAlertRuleTemplate):
         self.rule = rule

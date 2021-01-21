@@ -1,5 +1,5 @@
-from azsctl.classes import AlertRuleKind
-from azsctl import current_config
+from azsentinel.classes import AlertRuleKind
+from azsentinel import current_config
 import requests
 import sys
 import json
@@ -48,7 +48,11 @@ class BaseApi:
             )
 
             if result.status_code != 200:
-                return result.status_code
+                error = {
+                    "status_code": result.status_code,
+                    "content": result.json()
+                }
+                return error
 
             return result.json()
         except Exception as error:
@@ -83,6 +87,13 @@ class AzureSentinelApi(BaseApi):
             return alerts["value"]
         return []
 
+    def get_incident_entities(self, incident_id : str):
+        endpoint = f"{self._endpoint}/incidents/{incident_id}/entities?api-version=2019-01-01-preview"
+        entities = self.post(endpoint, payload=None)
+        if "entities" in entities:
+            return entities["entities"]
+        return []
+        
     def get_alert(self, alert_id : str):
         analytics = AzureLogAnalytics()
         result = analytics.execute_query(f"SecurityAlert | where SystemAlertId == \"{alert_id}\"")
@@ -99,6 +110,9 @@ class AzureSentinelApi(BaseApi):
 
         props_raw = alert["ExtendedProperties"]
         props = json.loads(props_raw)
+        if not "Query" in props:
+            return []
+            
         start_time = alert["StartTime"]
         end_time = alert["EndTime"]
         result = analytics.execute_query(props["Query"], timespan=f"{start_time}/{end_time}")

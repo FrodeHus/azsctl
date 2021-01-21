@@ -1,8 +1,8 @@
-from azsctl.api import AzureSentinelApi, AzureLogAnalytics, AzureManagementApi
+from azsentinel.api import AzureSentinelApi, AzureLogAnalytics, AzureManagementApi
 import asyncio
-
 class Controller:
     def __init__(self):
+        self.async_loop = asyncio.get_event_loop()
         self.sentinel_api = AzureSentinelApi()
         self.log_api = AzureLogAnalytics()
         self.mgmt_api = AzureManagementApi()
@@ -16,13 +16,3 @@ class Controller:
         return incidents
 
 
-class RefreshableItems:
-    def __init__(self, method, method_args):
-        self.retrieve = method
-        self.method_args = method_args
-        result = self.retrieve(*self.method_args)
-        self.items = result
-
-    def refresh(self):
-        result = self.retrieve(*self.method_args)
-        self.items = result

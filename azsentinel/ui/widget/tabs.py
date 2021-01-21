@@ -33,7 +33,8 @@ class TabPanel(urwid.WidgetWrap):
             self.set_active_tab((self.tab_offset - 1) % num_tabs)
         elif key == "right":
             self.set_active_tab((self.tab_offset + 1) % num_tabs)
-        return self._w.keypress(size, key)
+        else:
+            return self._w.keypress(size, key)
 
     def set_active_tab(self, offset):
         self.tab_offset = offset

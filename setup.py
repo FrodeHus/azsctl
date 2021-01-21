@@ -2,10 +2,9 @@ import setuptools
 
 setuptools.setup(
     name="azsctl",
-    version="0.2.3",
+    version="0.2.4",
     packages=setuptools.find_packages(),
-    scripts=['azsctl.completion.sh'],
-    entry_points={"console_scripts": ["azsctl=azsctl.__main__:main"]},
+    scripts=['azsctl','azsctl.completion.sh'],
     author="Frode Hus",
     author_email="frode.hus@outlook.com",
     description="Simple tool that lets you work with Azure Sentinel",

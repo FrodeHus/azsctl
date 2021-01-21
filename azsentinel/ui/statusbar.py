@@ -1,7 +1,7 @@
 import urwid
-from azsctl.ui import signals
-from azsctl import current_config
-from azsctl.auth import TokenRequester
+from azsentinel.ui import signals
+from azsentinel import current_config
+from azsentinel.auth import TokenRequester
 
 class CommandPrompt(urwid.Edit):
     def keypress(self, size, key):

@@ -1,9 +1,7 @@
-from azsctl.ui.window import Window
-from azsctl.ui import signals
+from azsentinel.ui.window import Window
+from azsentinel.ui import signals
 from .controller import Controller
 import urwid
-
-
 class AzsctlUI:
     def __init__(self, controller : Controller) -> None:
         palette = [
@@ -11,14 +9,17 @@ class AzsctlUI:
             ("body", "","black"),
             ("heading", "white", "dark blue"),
             ("heading inactive", "light gray", "light blue"),
-            ("focus", "light magenta", "light gray"),
+            ("focus", "","", "", "#fdf6e3", "#93a1a1"),
             ("actionbar:action", "white", "black"),
             ("important", 'dark blue','black',('standout','underline'))
         ]
+        async_loop = controller.async_loop
+        event_loop = urwid.AsyncioEventLoop(loop=async_loop)
         self.controller = controller
         self.window = Window(controller)
-        self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input)
+        self.loop = urwid.MainLoop(urwid.AttrWrap(self.window, "body"), palette=palette, unhandled_input=self.unhandled_input, event_loop=event_loop)
         self.loop.screen.set_terminal_properties(colors=256)
+
         signals.delayed_signal.connect(self.signal_delayed)
 
     def unhandled_input(self, key):
