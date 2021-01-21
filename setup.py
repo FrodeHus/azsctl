@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="azsctl",
-    version="0.2.4",
+    version="0.2.5",
     packages=setuptools.find_packages(),
     scripts=['azsctl','azsctl.completion.sh'],
     author="Frode Hus",
