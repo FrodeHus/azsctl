@@ -2,8 +2,8 @@ import json
 from azsentinel.ui.widget.tabs import TabPanel, TabItem
 from azsentinel.ui.widget.list import SentinelItemList
 from azsentinel.ui.widget.table import Table
-from azsentinel.api import AzureSentinelApi
-from azsentinel.ui.widget.dialog import Dialog
+from azsentinel.api import AzureLogAnalytics, AzureSentinelApi
+from azsentinel.ui.widget.dialog import QueryEditor
 from dateutil.parser import parse
 import urwid
 
@@ -16,7 +16,7 @@ class IncidentView(urwid.WidgetWrap):
         urwid.WidgetWrap.__init__(self, self.main_list)        
 
     def keypress(self, size, key):
-        if key in ("esc"):
+        if key == "esc":
             self.hide_incident()
         if key == "tab" and self.show_detail:
             self.switch_focus()
@@ -96,35 +96,41 @@ class IncidentEventView(urwid.Frame):
             urwid.connect_signal(self.body, 'item_selected', self.handle_item_selected)
             self.is_first_view = False   
         if key == "Q":
-            self.edit_and_run_query()     
+            self.edit_query()    
         else:
             super().keypress(size, key)
 
-    def edit_and_run_query(self):
+    def edit_query(self):
         alert_rule_id = self.incident["properties"]["relatedAnalyticRuleIds"][0]
         if not alert_rule_id:
             return
         alert_rule = self.api.get(f"{alert_rule_id}?api-version=2020-01-01")
         if not alert_rule:
             return
-        query = alert_rule["properties"]["query"]
-        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Edit(edit_text=query, multiline=True)])),title="Edit rule query")
-        view = Dialog(view, self._body)
+        query = alert_rule["properties"]["query"]        
+        view = QueryEditor(query, self._body)
         self._original_body = self._body
-        urwid.connect_signal(view, Dialog.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        urwid.connect_signal(view, QueryEditor.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        urwid.connect_signal(view, QueryEditor.SIGNAL_EXECUTE, self.run_query)
         self.set_body(view)
 
+    def run_query(self, query):
+        self.set_body(self._original_body)
 
 
     def handle_item_selected(self, sender, item):
         view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Text(json.dumps(item, indent=2))])))
-        view = Dialog(view, self._body)
+        view = QueryEditor(view, self._body)
         self._original_body = self._body
-        urwid.connect_signal(view, Dialog.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        urwid.connect_signal(view, QueryEditor.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
         self.set_body(view)
         
 
-    def load_events(self):
+    def load_events(self, query = None):
+        if query:
+            analytics = AzureLogAnalytics()
+            return analytics.execute_query(query)
+            
         alerts = self.api.get_incident_alerts(self.incident["name"])
         events = []
         for alert in alerts:
@@ -133,8 +139,8 @@ class IncidentEventView(urwid.Frame):
                 events = events + alert_events
         return events
 
-    def prepare_view(self):
-        data = self.load_events()
+    def prepare_view(self, query = None):
+        data = self.load_events(query)
         event_list = Table(data)
         return event_list
 

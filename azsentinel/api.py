@@ -48,7 +48,11 @@ class BaseApi:
             )
 
             if result.status_code != 200:
-                return result.status_code
+                error = {
+                    "status_code": result.status_code,
+                    "content": result.json()
+                }
+                return error
 
             return result.json()
         except Exception as error:

@@ -105,6 +105,8 @@ class CommandLoader(CLICommandsLoader):
             g.command("show", "get_rule")
             g.command("edit", "edit_rule")
             g.command("run", "run_rule_query")
+            g.command("backup", "backup_rules")
+            g.command("restore", "restore_rules", confirmation=True)
             g.command("import", "import_rule", confirmation=True)
         with CommandGroup(self, "rule template", "azsentinel.commands.rule#{}") as g:
             g.command("list", "list_alert_rule_templates")

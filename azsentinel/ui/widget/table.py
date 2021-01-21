@@ -86,6 +86,7 @@ class Table(urwid.Frame):
             self.headers = item.keys()
         self._header = TableHeader(self.headers)
         self._body = TableView()
+        
         self._build_rows(self._result)
         urwid.register_signal(self.__class__, ['keypress','item_selected'])
         super().__init__(self._body, header=urwid.AttrMap(self._header, 'heading'), focus_part='body')
