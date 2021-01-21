@@ -1,6 +1,5 @@
 import datetime
 import uuid
-import dateutil
 from typing import List
 from enum import Enum
 
@@ -204,7 +203,7 @@ class ScheduledAlertRuleTemplate(ScheduledAlertRule):
 
     @property
     def created_date(self):
-        return dateutil.parser.parse(self.properties["createdDateUTC"])
+        return self.properties["createdDateUTC"]
 
     @created_date.setter
     def created_date(self, value: datetime.datetime):

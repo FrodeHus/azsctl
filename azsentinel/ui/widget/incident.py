@@ -4,7 +4,6 @@ from azsentinel.ui.widget.list import SentinelItemList
 from azsentinel.ui.widget.table import Table
 from azsentinel.api import AzureLogAnalytics, AzureSentinelApi
 from azsentinel.ui.widget.dialog import QueryEditor
-from dateutil.parser import parse
 import urwid
 
 class IncidentView(urwid.WidgetWrap):
@@ -220,17 +219,11 @@ class IncidentItem(urwid.WidgetWrap):
     def selectable(self):
         return True
 
-    def format_timestamp(self, s):
-        d = parse(s)        
-        return d.strftime("%Y-%m-%d %H:%M:%S")        
-
     def get_rule_text(self):
         owner = self.data["properties"]["owner"]["userPrincipalName"]
         if not owner:
             owner = "Unassigned"
-        date = self.data["properties"]["createdTimeUtc"]
-        if date:
-            date = self.format_timestamp(date)
+        date = self.data["properties"]["createdTimeUtc"]        
         return urwid.Columns(
             [
                 ("weight", 1, urwid.Text(date)),
