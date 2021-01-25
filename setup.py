@@ -10,7 +10,7 @@ setuptools.setup(
     description="Simple tool that lets you work with Azure Sentinel",
     url="https://github.com/frodehus/azsctl",
     python_requires=">=3.6",
-    install_requires=["requests", "knack", "msal", "alive_progress", "pyinquirer", "urwid"],
+    install_requires=["requests", "knack", "msal", "alive_progress", "pyinquirer", "urwid", "blinker"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
