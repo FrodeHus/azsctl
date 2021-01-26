@@ -6,13 +6,14 @@ from azsentinel.api import AzureLogAnalytics, AzureSentinelApi
 from azsentinel.ui.widget.dialog import QueryEditor
 import urwid
 
+
 class IncidentView(urwid.WidgetWrap):
     def __init__(self):
         self.api = AzureSentinelApi()
         self.main_list = SentinelItemList(self.load_incidents)
         self.show_detail = False
         urwid.connect_signal(self.main_list, "item_selected", self.handle_item_selected)
-        urwid.WidgetWrap.__init__(self, self.main_list)        
+        urwid.WidgetWrap.__init__(self, self.main_list)
 
     def keypress(self, size, key):
         if key == "esc":
@@ -28,7 +29,7 @@ class IncidentView(urwid.WidgetWrap):
 
     def hide_incident(self):
         self.show_detail = False
-        if hasattr(self, 'detail_view'):
+        if hasattr(self, "detail_view"):
             del self.detail_view
         self._w = self.main_list
 
@@ -45,16 +46,32 @@ class IncidentView(urwid.WidgetWrap):
         self.show_detail = True
         incident_detail = IncidentDetailView(incident)
         entities = self._get_incident_entities(incident["name"])
+        incident_view = IncidentEventView(incident)
+        urwid.connect_signal(
+            incident_view, IncidentEventView.SIGNAL_OPEN_QUERY_EDITOR, self.edit_query
+        )
         tabs = TabPanel(
             [
                 TabItem("Overview", incident_detail),
                 TabItem("Entities", Table(entities)),
-                TabItem("Events", IncidentEventView(incident)),
+                TabItem("Events", incident_view),
             ]
         )
         self.detail_view = urwid.Pile([self.main_list, tabs], 1)
 
         self._w = self.detail_view
+
+    def edit_query(self, query):
+        view = QueryEditor(query, self._w)
+        self._original_body = self._w
+
+        urwid.connect_signal(
+            view,
+            QueryEditor.SIGNAL_DIALOG_CLOSED,
+            lambda: self._set_w(self._original_body),
+        )
+        # urwid.connect_signal(view, QueryEditor.SIGNAL_EXECUTE, self.run_query)
+        self._set_w(view)
 
     def handle_item_selected(self, sender, item):
         self.show_incident(item)
@@ -78,11 +95,26 @@ class IncidentView(urwid.WidgetWrap):
 
 
 class IncidentEventView(urwid.Frame):
+    SIGNAL_OPEN_QUERY_EDITOR = "open_query_editor"
+
     def __init__(self, incident):
         self.api = AzureSentinelApi()
         self.incident = incident
-        self._body = urwid.Filler(urwid.Text(["Press '",("important", "r"), "' to load events (could take a while)"], align="center"), 'middle')
+        self._body = urwid.Filler(
+            urwid.Text(
+                [
+                    "Press '",
+                    ("important", "r"),
+                    "' to load events (could take a while)",
+                ],
+                align="center",
+            ),
+            "middle",
+        )
         self.is_first_view = True
+        urwid.register_signal(
+            self.__class__, [IncidentEventView.SIGNAL_OPEN_QUERY_EDITOR]
+        )
         super().__init__(self._body)
 
     def selectable(self):
@@ -90,12 +122,14 @@ class IncidentEventView(urwid.Frame):
 
     def keypress(self, size, key):
         if key == "r" and self.is_first_view:
-            self.set_body(urwid.Filler(urwid.Text("Running query...", align="center"), "middle"))
+            self.set_body(
+                urwid.Filler(urwid.Text("Running query...", align="center"), "middle")
+            )
             self.body = self.prepare_view()
-            urwid.connect_signal(self.body, 'item_selected', self.handle_item_selected)
-            self.is_first_view = False   
+            urwid.connect_signal(self.body, "item_selected", self.handle_item_selected)
+            self.is_first_view = False
         if key == "Q":
-            self.edit_query()    
+            self.edit_query()
         else:
             super().keypress(size, key)
 
@@ -106,30 +140,29 @@ class IncidentEventView(urwid.Frame):
         alert_rule = self.api.get(f"{alert_rule_id}?api-version=2020-01-01")
         if not alert_rule:
             return
-        query = alert_rule["properties"]["query"]        
-        view = QueryEditor(query, self._body)
-        self._original_body = self._body
-        urwid.connect_signal(view, QueryEditor.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
-        urwid.connect_signal(view, QueryEditor.SIGNAL_EXECUTE, self.run_query)
-        self.set_body(view)
-
-    def run_query(self, query):
-        self.set_body(self._original_body)
-
+        query = alert_rule["properties"]["query"]
+        urwid.emit_signal(self, IncidentEventView.SIGNAL_OPEN_QUERY_EDITOR, query)
 
     def handle_item_selected(self, sender, item):
-        view = urwid.LineBox(urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Text(json.dumps(item, indent=2))])))
+        view = urwid.LineBox(
+            urwid.ListBox(
+                urwid.SimpleFocusListWalker([urwid.Text(json.dumps(item, indent=2))])
+            )
+        )
         view = QueryEditor(view, self._body)
         self._original_body = self._body
-        urwid.connect_signal(view, QueryEditor.SIGNAL_DIALOG_CLOSED, lambda: self.set_body(self._original_body))
+        urwid.connect_signal(
+            view,
+            QueryEditor.SIGNAL_DIALOG_CLOSED,
+            lambda: self.set_body(self._original_body),
+        )
         self.set_body(view)
-        
 
-    def load_events(self, query = None):
+    def load_events(self, query=None):
         if query:
             analytics = AzureLogAnalytics()
             return analytics.execute_query(query)
-            
+
         alerts = self.api.get_incident_alerts(self.incident["name"])
         events = []
         for alert in alerts:
@@ -138,10 +171,11 @@ class IncidentEventView(urwid.Frame):
                 events = events + alert_events
         return events
 
-    def prepare_view(self, query = None):
+    def prepare_view(self, query=None):
         data = self.load_events(query)
         event_list = Table(data)
         return event_list
+
 
 class IncidentDetailView(urwid.WidgetWrap):
     def __init__(self, incident):
@@ -223,7 +257,7 @@ class IncidentItem(urwid.WidgetWrap):
         owner = self.data["properties"]["owner"]["userPrincipalName"]
         if not owner:
             owner = "Unassigned"
-        date = self.data["properties"]["createdTimeUtc"]        
+        date = self.data["properties"]["createdTimeUtc"]
         return urwid.Columns(
             [
                 ("weight", 1, urwid.Text(date)),
