@@ -37,6 +37,12 @@ Commands:
 
 ```
 
+## Experimental UI
+
+Teaser shot of UI - not too functional at the moment
+
+![experimental ui](docs/azsctl-ui.png)
+
 ## Acknowledgements
 
 Took a lot of inspiration (and some code lines) from [mitmproxy](https://github.com/mitmproxy/mitmproxy) to bend [urwid](https://urwid.org) to my will.
