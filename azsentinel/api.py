@@ -65,6 +65,7 @@ class AzureSentinelApi(BaseApi):
     def __init__(self):
         super().__init__()
         _, workspace_id = current_config.get_workspace()
+        self._workspace_id = workspace_id
         self._endpoint = f"{workspace_id}/providers/Microsoft.SecurityInsights/"
 
     def get_incidents(self, filter : str):
@@ -146,6 +147,13 @@ class AzureSentinelApi(BaseApi):
 
     def list_data_connectors(self):
         endpoint = f"{self._endpoint}/dataConnectors?api-version=2020-01-01"
+        result = self.get(endpoint)
+        return result["value"]
+    
+    def get_saved_searches(self, filter : str = None):
+        endpoint = f"{self._workspace_id}/savedSearches?api-version=2017-04-26-preview"
+        if filter:
+            endpoint += f"&$filter={filter}"
         result = self.get(endpoint)
         return result["value"]
 

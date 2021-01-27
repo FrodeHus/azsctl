@@ -117,6 +117,8 @@ class CommandLoader(CLICommandsLoader):
             g.command("list", "list_data_connectors")
         with CommandGroup(self, "analytics", "azsentinel.commands.analytics#{}") as g:
             g.command("query", "execute_query")
+        with CommandGroup(self, "analytics searches", "azsentinel.commands.analytics#{}") as g:
+            g.command("list", "saved_searches")
         with CommandGroup(self, "analytics datasource", "azsentinel.commands.analytics#{}") as g:
             g.command("list", "list_datasources")
         with CommandGroup(self, "workspace", "azsentinel.commands.workspace#{}") as g:

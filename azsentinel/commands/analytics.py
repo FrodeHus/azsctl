@@ -1,4 +1,4 @@
-from azsentinel.api import AzureLogAnalytics
+from azsentinel.api import AzureLogAnalytics, AzureSentinelApi
 
 def execute_query(kql : str):
     api = AzureLogAnalytics()
@@ -22,3 +22,7 @@ def execute_query(kql : str):
 def list_datasources():
     api = AzureLogAnalytics()
     return api.list_datasources()
+
+def saved_searches(filter : str = None):
+    api = AzureSentinelApi()
+    return api.get_saved_searches(filter)
