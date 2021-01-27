@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "azsentinel",
-            "args": ["ui"]
+            "args": ["analytics", "searches", "list"]
         }
     ]
 }
